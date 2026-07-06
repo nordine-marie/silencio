@@ -49,6 +49,7 @@ docs/                 product spec, implementation plan, design system
 | `scripts/run.sh` | Boot sim → build → install → launch → screenshot. The "see the app" primitive. |
 | `scripts/screenshot.sh [out.png]` | Screenshot the booted simulator. |
 | `scripts/logs.sh [filter]` | Stream app + extension logs from the booted simulator. |
+| `scripts/icons.sh` | Regenerate every `AppIcon.appiconset` PNG from `docs/design/app-icon.svg` (needs `rsvg-convert`). |
 | `scripts/format.sh` / `scripts/lint.sh` | swiftformat / swiftlint. |
 
 Set a different simulator with `SIM_NAME="iPhone 17 Pro" scripts/run.sh`.
