@@ -106,7 +106,7 @@ extension View {
     }
 }
 
-/// The "12M / numéros couverts" stat card.
+/// The "12 millions / numéros couverts" stat card.
 struct StatCard: View {
     let value: String
     let label: String
@@ -189,14 +189,12 @@ enum FrenchFormat {
         return decimal(value)
     }
 
-    /// `12_000_000` → `"12M"` for the compact stat cards.
-    static func compactCount(_ value: Int64) -> String {
+    /// `12_384_922` → `"12 millions"` for the stat cards — always spelled out,
+    /// never the abbreviated "M" (our senior audience wouldn't read it as "millions").
+    static func approxMillions(_ value: Int64) -> String {
         if value >= 1_000_000 {
-            let millions = Double(value) / 1_000_000
-            let rounded = (millions * 10).rounded() / 10
-            return rounded == rounded.rounded()
-                ? "\(Int(rounded))M"
-                : String(format: "%.1fM", locale: Locale(identifier: "fr_FR"), rounded)
+            let millions = (Double(value) / 1_000_000).rounded()
+            return "\(Int(millions))\u{00A0}millions"
         }
         return decimal(value)
     }

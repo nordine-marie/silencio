@@ -242,7 +242,7 @@ struct DashboardView: View {
     private var statRow: some View {
         HStack(spacing: 14) {
             StatCard(
-                value: FrenchFormat.compactCount(model.activePlan.totalEntries),
+                value: FrenchFormat.approxMillions(model.activePlan.totalEntries),
                 label: "numéros couverts"
             )
             StatCard(
