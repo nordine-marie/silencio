@@ -13,6 +13,7 @@ struct HowItWorksView: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
+                    BrandMark(height: 22, color: Brand.brick)
                     Spacer()
                     Button("Passer", action: onContinue)
                         .font(.system(size: 16, weight: .semibold))

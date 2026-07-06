@@ -62,11 +62,14 @@ struct SettingsView: View {
                             }
                         }
 
-                        Text("Silencia \(appVersion) · Fait en France · Aucune donnée collectée")
-                            .font(.brandCaption)
-                            .foregroundStyle(Brand.inkFaint)
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 28)
+                        VStack(spacing: 12) {
+                            BrandMark(height: 22, color: Brand.inkFaint)
+                            Text("Silencia \(appVersion) · Fait en France · Aucune donnée collectée")
+                                .font(.brandCaption)
+                                .foregroundStyle(Brand.inkFaint)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 28)
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 20)
