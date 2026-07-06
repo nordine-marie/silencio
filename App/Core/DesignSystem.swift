@@ -106,7 +106,7 @@ extension View {
     }
 }
 
-/// The "12 millions / numéros couverts" stat card.
+/// The "12 millions / de numéros couverts" stat card.
 struct StatCard: View {
     let value: String
     let label: String

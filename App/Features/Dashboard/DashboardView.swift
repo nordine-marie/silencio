@@ -243,7 +243,7 @@ struct DashboardView: View {
         HStack(spacing: 14) {
             StatCard(
                 value: FrenchFormat.approxMillions(model.activePlan.totalEntries),
-                label: "numéros couverts"
+                label: "de numéros couverts"
             )
             StatCard(
                 value: "\(model.rangeData.ranges.count)",
