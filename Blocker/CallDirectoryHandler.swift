@@ -18,7 +18,7 @@ final class CallDirectoryHandler: CXCallDirectoryProvider {
 
         // The extension must never materialize the 12M-number list. It reads the
         // small, validated plan and streams it. `bundledDefault` is the ship-safe
-        // source; the App Group config (active tier + user entries) is layered in
+        // source; the App Group config (range data + user entries) is layered in
         // by the main app before it triggers a reload.
         let plan = activePlan()
 
@@ -59,7 +59,7 @@ final class CallDirectoryHandler: CXCallDirectoryProvider {
 }
 
 extension CallDirectoryHandler: CXCallDirectoryExtensionContextDelegate {
-    func requestFailed(for extensionContext: CXCallDirectoryExtensionContext, withError error: Error) {
+    func requestFailed(for _: CXCallDirectoryExtensionContext, withError error: Error) {
         // iOS may kill a long request (isInterrupted); it re-invokes us and the full
         // reload path recomputes everything deterministically, so this is recoverable.
         NSLog("[SilenciaBlocker] request failed: \(error.localizedDescription)")

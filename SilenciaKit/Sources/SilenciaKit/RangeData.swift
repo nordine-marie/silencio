@@ -28,11 +28,11 @@ public extension RangeData {
         public var description: String {
             switch self {
             case .emptyRanges:
-                return "range data contains no ranges"
-            case .malformedPrefix(let p):
-                return "malformed prefix '\(p)' (expected \(ArcepRange.prefixLength) digits)"
-            case .overlappingRanges(let a, let b):
-                return "ranges '\(a)' and '\(b)' overlap; Arcep ranges must be disjoint"
+                "range data contains no ranges"
+            case let .malformedPrefix(prefix):
+                "malformed prefix '\(prefix)' (expected \(ArcepRange.prefixLength) digits)"
+            case let .overlappingRanges(first, second):
+                "ranges '\(first)' and '\(second)' overlap; Arcep ranges must be disjoint"
             }
         }
     }
@@ -52,7 +52,7 @@ public extension RangeData {
         }
 
         let sorted = runs.sorted { $0.run.base < $1.run.base }
-        for i in 1..<sorted.count {
+        for i in 1 ..< sorted.count {
             let prev = sorted[i - 1]
             let curr = sorted[i]
             if curr.run.base <= prev.run.upperBound {
@@ -87,7 +87,7 @@ public extension RangeData {
             ArcepRange(prefix: "33568", label: "05 68"),
             ArcepRange(prefix: "33569", label: "05 69"),
             ArcepRange(prefix: "33948", label: "09 48"),
-            ArcepRange(prefix: "33949", label: "09 49"),
+            ArcepRange(prefix: "33949", label: "09 49")
         ]
     )
 

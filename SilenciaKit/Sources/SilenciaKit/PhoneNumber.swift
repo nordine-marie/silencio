@@ -17,25 +17,27 @@ public enum PhoneNumber {
         let digits = raw.unicodeScalars
             .filter { CharacterSet.decimalDigits.contains($0) || $0 == "+" }
             .map(Character.init)
-        var s = String(digits)
+        var national = String(digits)
 
-        if s.hasPrefix("+33") {
-            s = String(s.dropFirst(3))
-        } else if s.hasPrefix("0033") {
-            s = String(s.dropFirst(4))
-        } else if s.hasPrefix("33"), s.count == 2 + nationalDigits {
-            s = String(s.dropFirst(2))
-        } else if s.hasPrefix("0") {
-            s = String(s.dropFirst(1))
+        if national.hasPrefix("+33") {
+            national = String(national.dropFirst(3))
+        } else if national.hasPrefix("0033") {
+            national = String(national.dropFirst(4))
+        } else if national.hasPrefix("33"), national.count == 2 + nationalDigits {
+            national = String(national.dropFirst(2))
+        } else if national.hasPrefix("0") {
+            national = String(national.dropFirst(1))
         } else {
             return nil
         }
 
-        guard s.count == nationalDigits, s.allSatisfy(\.isNumber), let nsn = Int64(s) else {
+        guard national.count == nationalDigits, national.allSatisfy(\.isNumber),
+              let nsn = Int64(national)
+        else {
             return nil
         }
         // Reject a leading-zero NSN (would collapse a digit); French NSNs start 1–9.
-        guard let first = s.first, first != "0" else { return nil }
+        guard let first = national.first, first != "0" else { return nil }
 
         return countryCode * Int64(pow10(nationalDigits)) + nsn
     }
@@ -48,18 +50,23 @@ public enum PhoneNumber {
         let digits = raw.unicodeScalars
             .filter { CharacterSet.decimalDigits.contains($0) || $0 == "+" }
             .map(Character.init)
-        var s = String(digits)
+        var national = String(digits)
 
-        if s.hasPrefix("+33") { s = String(s.dropFirst(3)) }
-        else if s.hasPrefix("0033") { s = String(s.dropFirst(4)) }
-        else if s.hasPrefix("0") { s = String(s.dropFirst(1)) }
-        else { return nil }
+        if national.hasPrefix("+33") {
+            national = String(national.dropFirst(3))
+        } else if national.hasPrefix("0033") {
+            national = String(national.dropFirst(4))
+        } else if national.hasPrefix("0") {
+            national = String(national.dropFirst(1))
+        } else {
+            return nil
+        }
 
-        guard !s.isEmpty, s.count <= nationalDigits, s.allSatisfy(\.isNumber),
-              let first = s.first, first != "0" else { return nil }
+        guard !national.isEmpty, national.count <= nationalDigits, national.allSatisfy(\.isNumber),
+              let first = national.first, first != "0" else { return nil }
 
-        let spanDigits = nationalDigits - s.count
-        guard spanDigits >= 0, spanDigits <= maxSpanDigits, let nsnPrefix = Int64(s) else {
+        let spanDigits = nationalDigits - national.count
+        guard spanDigits >= 0, spanDigits <= maxSpanDigits, let nsnPrefix = Int64(national) else {
             return nil
         }
 
@@ -68,7 +75,7 @@ public enum PhoneNumber {
         return BlockingRun(base: base, count: span)
     }
 
-    private static func pow10(_ n: Int) -> Int {
-        (0..<n).reduce(1) { acc, _ in acc * 10 }
+    private static func pow10(_ exponent: Int) -> Int {
+        (0 ..< exponent).reduce(1) { acc, _ in acc * 10 }
     }
 }

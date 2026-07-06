@@ -12,7 +12,7 @@ public struct BlockingPlan: Equatable, Sendable {
     /// Arcep range are absorbed (the "déjà couvert ✅" case) rather than duplicated.
     public init(arcepRanges: [ArcepRange], userRuns: [BlockingRun] = []) {
         let arcepRuns = arcepRanges.compactMap(\.run)
-        self.runs = BlockingRunMerger.coalesce(arcepRuns + userRuns)
+        runs = BlockingRunMerger.coalesce(arcepRuns + userRuns)
     }
 
     /// Direct initializer for pre-coalesced runs (used by the extension after it
@@ -41,7 +41,9 @@ public struct BlockingPlan: Equatable, Sendable {
     /// The lazily-generated, strictly-ascending sequence of every number to block.
     /// **Constant memory** regardless of `totalEntries`: it walks runs and offsets,
     /// never allocating an array. This is what the extension feeds to CallKit.
-    public var numbers: BlockingNumberSequence { BlockingNumberSequence(runs: runs) }
+    public var numbers: BlockingNumberSequence {
+        BlockingNumberSequence(runs: runs)
+    }
 }
 
 /// A `Sequence` that yields every blocked number in strictly ascending order using
@@ -49,14 +51,18 @@ public struct BlockingPlan: Equatable, Sendable {
 public struct BlockingNumberSequence: Sequence, Sendable {
     let runs: [BlockingRun]
 
-    public func makeIterator() -> Iterator { Iterator(runs: runs) }
+    public func makeIterator() -> Iterator {
+        Iterator(runs: runs)
+    }
 
     public struct Iterator: IteratorProtocol {
         private let runs: [BlockingRun]
         private var runIndex = 0
         private var offset: Int64 = 0
 
-        init(runs: [BlockingRun]) { self.runs = runs }
+        init(runs: [BlockingRun]) {
+            self.runs = runs
+        }
 
         public mutating func next() -> Int64? {
             while runIndex < runs.count {

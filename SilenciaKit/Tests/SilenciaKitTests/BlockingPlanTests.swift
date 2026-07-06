@@ -1,20 +1,20 @@
-import XCTest
 @testable import SilenciaKit
+import XCTest
 
 final class BlockingPlanTests: XCTestCase {
     // MARK: Run coalescing
 
     func testCoalesceMergesOverlappingAndAdjacentRuns() {
         let runs = [
-            BlockingRun(base: 0, count: 10),   // 0...9
-            BlockingRun(base: 5, count: 10),   // 5...14  (overlaps)
-            BlockingRun(base: 15, count: 5),   // 15...19 (adjacent to previous end 14)
-            BlockingRun(base: 100, count: 1),  // isolated
+            BlockingRun(base: 0, count: 10), // 0...9
+            BlockingRun(base: 5, count: 10), // 5...14  (overlaps)
+            BlockingRun(base: 15, count: 5), // 15...19 (adjacent to previous end 14)
+            BlockingRun(base: 100, count: 1) // isolated
         ]
         let merged = BlockingRunMerger.coalesce(runs)
         XCTAssertEqual(merged, [
-            BlockingRun(base: 0, count: 20),   // 0...19 fused
-            BlockingRun(base: 100, count: 1),
+            BlockingRun(base: 0, count: 20), // 0...19 fused
+            BlockingRun(base: 100, count: 1)
         ])
     }
 
@@ -22,7 +22,7 @@ final class BlockingPlanTests: XCTestCase {
         let runs = [
             BlockingRun(base: 300, count: 2),
             BlockingRun(base: 10, count: 2),
-            BlockingRun(base: 200, count: 2),
+            BlockingRun(base: 200, count: 2)
         ]
         let merged = BlockingRunMerger.coalesce(runs)
         XCTAssertEqual(merged.map(\.base), [10, 200, 300])
@@ -33,11 +33,11 @@ final class BlockingPlanTests: XCTestCase {
 
     func testNumbersAreStrictlyAscendingAndComplete() {
         let plan = BlockingPlan(runs: [
-            BlockingRun(base: 1_000, count: 3),
-            BlockingRun(base: 5_000, count: 2),
+            BlockingRun(base: 1000, count: 3),
+            BlockingRun(base: 5000, count: 2)
         ])
         let emitted = Array(plan.numbers)
-        XCTAssertEqual(emitted, [1_000, 1_001, 1_002, 5_000, 5_001])
+        XCTAssertEqual(emitted, [1000, 1001, 1002, 5000, 5001])
         // Strictly ascending — the invariant CallKit requires.
         XCTAssertEqual(emitted, emitted.sorted())
         XCTAssertEqual(Set(emitted).count, emitted.count, "no duplicates")
@@ -67,7 +67,7 @@ final class BlockingPlanTests: XCTestCase {
         // at the real scale the extension faces.
         let plan = BlockingPlan(arcepRanges: [
             ArcepRange(prefix: "33948", label: "09 48"),
-            ArcepRange(prefix: "33949", label: "09 49"),
+            ArcepRange(prefix: "33949", label: "09 49")
         ])
         XCTAssertEqual(plan.totalEntries, 2_000_000)
 
@@ -85,9 +85,13 @@ final class BlockingPlanTests: XCTestCase {
     // MARK: State hashing (full vs incremental reload)
 
     func testStateHashStableAcrossEquivalentPlans() {
-        let a = BlockingPlan(arcepRanges: RangeData.bundledDefault.ranges)
-        let b = BlockingPlan(runs: RangeData.bundledDefault.ranges.compactMap(\.run).reversed())
-        XCTAssertEqual(a.stateHash, b.stateHash, "hash must be order-independent after coalesce")
+        let fromRanges = BlockingPlan(arcepRanges: RangeData.bundledDefault.ranges)
+        let fromRuns = BlockingPlan(runs: RangeData.bundledDefault.ranges.compactMap(\.run).reversed())
+        XCTAssertEqual(
+            fromRanges.stateHash,
+            fromRuns.stateHash,
+            "hash must be order-independent after coalesce"
+        )
     }
 
     func testStateHashChangesWhenPlanChanges() {

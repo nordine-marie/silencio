@@ -13,7 +13,7 @@ Read those before designing features.
 Real call *blocking* only works on a physical device — a simulator can't place phone calls.
 **But the hard, risky logic is pure Swift and fully testable headless.** That logic lives in
 the `SilenciaKit` Swift package: range math, E.164 normalization, the strictly-ascending
-memory-bounded blocking-number stream, entitlement gating, and the App Group config. Iterate
+memory-bounded blocking-number stream, block-list validation, and the App Group config. Iterate
 there with `swift test` (sub-second, no simulator). Only use the simulator to confirm the app
 builds, launches, and renders.
 
@@ -25,9 +25,11 @@ SilenciaKit/          Swift package — ALL pure logic + its XCTest suite (the f
     ArcepRange, RangeData      Arcep prefixes as data (+ bundled ranges.json, validation)
     BlockingRun, BlockingPlan  coalesced disjoint runs → O(1)-memory ascending number stream
     PhoneNumber                French E.164 normalization (numbers + bounded prefixes)
-    Entitlement                free-tier (2 ranges) vs lifetime (all 12) gating
     SharedConfig               App Group bridge the app writes and the extension reads
-App/                  SwiftUI app target (thin demo dashboard for now; consumes SilenciaKit)
+    BlockEntry, BlockListLogic user block-list entries + add-validation ("déjà couvert", limits)
+App/                  SwiftUI app target (the full product; consumes SilenciaKit)
+  Core/                      DesignSystem, AppModel, ExtensionBridge (CallKit)
+  Features/                  Onboarding (Promise→How→Activation→Success), Dashboard, BlockList, Settings
 Blocker/              Call Directory extension target (streams SilenciaKit's plan to CallKit)
 project.yml           XcodeGen spec — the .xcodeproj is GENERATED from this, never hand-edited
 scripts/              the harness (see below)
@@ -51,10 +53,16 @@ docs/                 product spec, implementation plan, design system
 
 Set a different simulator with `SIM_NAME="iPhone 17 Pro" scripts/run.sh`.
 
+**Screenshotting individual screens:** the simulator has no tap tooling, so Debug
+builds accept a launch argument to open any screen directly:
+`xcrun simctl launch booted com.silencia.app --screen=<name>` with
+`promise | how | activation | success | dashboard | paused | blocklist | settings`
+(see `App/Core/DebugScreens.swift`; `paused`/`blocklist` also seed demo state).
+
 ## Rules of the road
 
 - **Put logic in `SilenciaKit` with a test.** If a change can be expressed as pure logic
-  (anything about *which* numbers block, in what order, under what entitlement), it belongs in
+  (anything about *which* numbers block, in what order, under what validation), it belongs in
   the package with an XCTest — not in the app or extension where it can't be tested headless.
 - **Never hand-edit `*.xcodeproj`.** Change `project.yml` and run `scripts/gen.sh`. The
   `.xcodeproj` is gitignored and regenerated.

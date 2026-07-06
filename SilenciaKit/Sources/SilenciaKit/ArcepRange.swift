@@ -22,7 +22,9 @@ public struct ArcepRange: Codable, Equatable, Hashable, Sendable {
     }
 
     /// Number of subscriber numbers covered by this range (10^6 for a 5-digit prefix).
-    public var count: Int64 { Self.spanCount }
+    public var count: Int64 {
+        Self.spanCount
+    }
 
     /// The lowest E.164 number in the range as an `Int64`, e.g. `33162000000`.
     ///
