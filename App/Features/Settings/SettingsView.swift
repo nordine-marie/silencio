@@ -168,23 +168,23 @@ struct FAQView: View {
     private let items = [
         Item(
             question: "Pourquoi ça marche à tous les coups ?",
-            answer: "Depuis le 1er janvier 2023, la réglementation française (décision Arcep) oblige les plateformes de démarchage à appeler depuis des plages de numéros dédiées et connues (01 62, 01 63, 02 70, 02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48, 09 49). Silencia bloque l'intégralité de ces plages au niveau du système : les appels ne sonnent jamais. Ce n'est pas un filtre statistique — c'est déterministe."
+            answer: "Depuis le 1er janvier 2023, la loi française oblige les sociétés de démarchage à vous appeler depuis des séries de numéros bien précises et connues (01 62, 01 63, 02 70, 02 71, 03 77, 03 78, 04 24, 04 25, 05 68, 05 69, 09 48, 09 49). Silencia bloque toutes ces séries directement sur votre téléphone : ces appels ne sonnent jamais. Ce n'est pas une question de chance, c'est une certitude."
         ),
         Item(
             question: "Un appel important peut-il être bloqué par erreur ?",
-            answer: "Ces plages sont réservées par la réglementation à la prospection commerciale : aucun particulier ne peut vous appeler depuis ces numéros. Si un service utilisait une de ces plages hors prospection, il serait en infraction avec le plan de numérotation — la responsabilité lui incombe."
+            answer: "Non. Ces séries de numéros sont réservées par la loi au démarchage commercial : aucun proche, aucun médecin, aucun service public ne peut vous appeler depuis ces numéros. Si une entreprise s'en servait pour autre chose, c'est elle qui serait en faute, pas vous."
         ),
         Item(
             question: "Où vont mes données ?",
-            answer: "Nulle part. Silencia n'a ni compte, ni serveur, ni outil d'analyse. Le blocage s'exécute entièrement sur votre téléphone, et votre liste personnelle ne quitte jamais l'appareil."
+            answer: "Nulle part. Silencia ne crée aucun compte et n'envoie rien sur internet. Tout se passe sur votre téléphone, et votre liste personnelle ne le quitte jamais."
         ),
         Item(
             question: "L'application doit-elle rester ouverte ?",
-            answer: "Non. Une fois Silencia activé dans les Réglages iOS, le blocage est assuré par le système en permanence. Vous pouvez oublier l'application — c'est le but."
+            answer: "Non. Une fois Silencia activé dans les Réglages de votre iPhone, la protection reste active en permanence, même quand l'application est fermée. Vous pouvez l'oublier : c'est justement le but."
         ),
         Item(
-            question: "Que se passe-t-il si l'Arcep change les plages ?",
-            answer: "Les mises à jour des plages sont incluses, à vie, dans les mises à jour gratuites de l'application. « À vie » veut dire à vie."
+            question: "Que se passe-t-il si ces numéros changent ?",
+            answer: "Si la liste officielle évolue, la mise à jour est incluse gratuitement, à vie, dans l'application. « À vie » veut dire à vie."
         )
     ]
 
@@ -231,19 +231,19 @@ struct PrivacyPolicyView: View {
     private static let paragraphs: [(title: String, body: String)] = [
         (
             "Aucune donnée collectée",
-            "Silencia ne collecte, ne stocke et ne transmet aucune donnée personnelle. Pas de compte, pas de serveur, pas d'outil d'analyse, pas de SDK tiers."
+            "Silencia ne collecte, n'enregistre et ne transmet aucune donnée personnelle. Pas de compte, aucun envoi sur internet, aucun outil de suivi."
         ),
         (
             "Votre liste reste chez vous",
-            "Les numéros et préfixes que vous ajoutez sont enregistrés uniquement sur votre appareil, dans l'espace sécurisé de l'application. Ils ne quittent jamais votre téléphone."
+            "Les numéros que vous ajoutez sont enregistrés uniquement sur votre téléphone, dans l'espace protégé de l'application. Ils ne le quittent jamais."
         ),
         (
-            "Le blocage est local",
-            "La liste des plages Arcep est embarquée dans l'application et transmise au système iOS sur l'appareil. Aucun appel, aucun numéro, aucun journal n'est envoyé à qui que ce soit."
+            "Tout se passe sur votre téléphone",
+            "La liste officielle des numéros de démarchage est incluse dans l'application et transmise directement à votre iPhone. Aucun appel, aucun numéro, aucune trace n'est envoyé à qui que ce soit."
         ),
         (
             "Achat",
-            "Silencia s'achète une seule fois, sur l'App Store. Le paiement est traité par Apple : Silencia ne voit ni votre identité, ni votre moyen de paiement. Aucun achat intégré, jamais."
+            "Silencia s'achète une seule fois, sur l'App Store. Le paiement est géré par Apple : Silencia ne connaît ni votre identité, ni votre moyen de paiement. Aucun paiement supplémentaire, jamais."
         ),
         (
             "Contact",

@@ -158,7 +158,7 @@ struct InfoCard: View {
 
 /// The privacy covenant note shown at the bottom of screens.
 struct PrivacyNote: View {
-    var text = "Tout fonctionne sur votre téléphone. Aucun compte, aucun serveur, rien ne sort de l'appareil."
+    var text = "Tout fonctionne sur votre téléphone. Aucun compte, aucun envoi sur internet, rien ne sort de l'appareil."
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {

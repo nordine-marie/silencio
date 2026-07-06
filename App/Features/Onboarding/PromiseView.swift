@@ -32,8 +32,8 @@ struct PromiseView: View {
                     .multilineTextAlignment(.center)
 
                     Text(
-                        "Un seul interrupteur. Plus jamais un démarcheur — "
-                            + "sans compte, sans abonnement, sans données envoyées."
+                        "Un seul interrupteur, et plus jamais un démarcheur. "
+                            + "Sans compte, sans abonnement, et rien ne quitte votre téléphone."
                     )
                     .font(.brandBody)
                     .lineSpacing(4)

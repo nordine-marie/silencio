@@ -34,7 +34,7 @@ struct HowItWorksView: View {
                     InfoCard(
                         icon: "rectangle.grid.1x2",
                         iconColor: Brand.brick,
-                        title: "\(model.rangeData.ranges.count) plages officielles",
+                        title: "\(model.rangeData.ranges.count) séries officielles",
                         subtitle: "~\(coveredCount) de numéros couverts"
                     )
                     InfoCard(
@@ -62,11 +62,11 @@ struct HowItWorksView: View {
     }
 
     private var explainer: Text {
-        Text("Depuis 2023, la loi française (Arcep) oblige les démarcheurs à appeler depuis ")
-            + Text("\(model.rangeData.ranges.count) plages de numéros connues")
+        Text("Depuis 2023, la loi française oblige les démarcheurs à vous appeler depuis ")
+            + Text("\(model.rangeData.ranges.count) séries de numéros bien précises")
             .fontWeight(.bold)
             .foregroundColor(Brand.ink)
-            + Text(". Silencia les bloque toutes — ce n'est pas une supposition, c'est déterministe.")
+            + Text(". Silencia les bloque toutes. Ce n'est pas au hasard : c'est garanti.")
     }
 }
 

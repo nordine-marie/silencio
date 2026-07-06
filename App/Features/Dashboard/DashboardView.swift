@@ -150,8 +150,8 @@ struct DashboardView: View {
                 .font(.system(size: 24, weight: .heavy))
                 .foregroundStyle(Brand.ink)
             Text(
-                "Silencia a été désactivé dans les Réglages iOS. "
-                    + "Réactivez-le pour retrouver le silence — ça prend 15 secondes."
+                "Silencia a été désactivé dans les Réglages de votre iPhone. "
+                    + "Réactivez-le pour retrouver le silence. Cela prend 15 secondes."
             )
             .font(.brandSecondary)
             .lineSpacing(3)
@@ -184,7 +184,7 @@ struct DashboardView: View {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(Brand.amber)
-            Text("Le chargement des numéros n'a pas abouti.")
+            Text("Le chargement des numéros ne s'est pas terminé.")
                 .font(.system(size: 14))
                 .foregroundStyle(Brand.inkMuted)
             Spacer(minLength: 0)
@@ -206,7 +206,7 @@ struct DashboardView: View {
             )
             StatCard(
                 value: "\(model.rangeData.ranges.count)",
-                label: "plages officielles"
+                label: "séries officielles"
             )
         }
     }
@@ -260,7 +260,7 @@ struct DashboardView: View {
 
     private var blockListSubtitle: String {
         switch model.userEntries.count {
-        case 0: "Ajouter un numéro ou un préfixe"
+        case 0: "Ajouter un numéro ou un début de numéro"
         case 1: "1 ajout personnel"
         default: "\(model.userEntries.count) ajouts personnels"
         }
@@ -301,10 +301,10 @@ private struct LoadingHero: View {
 
     private var subtitle: String {
         guard blockedRanges > 0 else {
-            return "Le mur se dresse — première plage en cours de blocage."
+            return "Le mur se dresse. Première série de numéros en cours de blocage."
         }
         let s = blockedRanges > 1 ? "s" : ""
-        return "Le mur se dresse — \(blockedRanges) plage\(s) sur \(rangeCount) déjà bloquée\(s)."
+        return "Le mur se dresse. \(blockedRanges) série\(s) sur \(rangeCount) déjà bloquée\(s)."
     }
 
     var body: some View {

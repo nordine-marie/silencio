@@ -89,7 +89,7 @@ struct BlockListView: View {
             Image(systemName: "plus")
                 .font(.system(size: 18, weight: .medium))
                 .foregroundStyle(Brand.inkFaint)
-            TextField("Ajouter un numéro ou un préfixe", text: $input)
+            TextField("Ajouter un numéro ou un début de numéro", text: $input)
                 .font(.brandRow)
                 .foregroundStyle(Brand.ink)
                 .keyboardType(.phonePad)
@@ -121,7 +121,7 @@ struct BlockListView: View {
     private func entryRow(_ entry: BlockEntry) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text(entry.kind == .prefix ? "\(entry.display) · préfixe" : entry.display)
+                Text(entry.kind == .prefix ? "\(entry.display) · début de numéro" : entry.display)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(Brand.ink)
                 Text(entry.kind == .prefix
@@ -189,30 +189,30 @@ struct BlockListView: View {
             input = ""
             feedback = .success(
                 "\(rangeLabel) · déjà couvert",
-                "Ce préfixe fait partie des plages Arcep."
+                "Silencia bloque déjà ces numéros automatiquement."
             )
         case .duplicate:
             feedback = .success(
                 "Déjà dans votre liste",
-                "Cette entrée est déjà bloquée par un de vos ajouts."
+                "Vous avez déjà ajouté ce numéro."
             )
         case .invalid:
             feedback = .warning(
                 icon: "questionmark.circle",
                 "Numéro non reconnu",
-                "Entrez un numéro français (06 12 34 56 78) ou un préfixe (08 99 70)."
+                "Entrez un numéro français (06 12 34 56 78) ou un début de numéro (08 99 70)."
             )
         case .tooBroad:
             feedback = .warning(
                 icon: "exclamationmark.triangle",
-                "Préfixe trop large",
-                "Précisez au moins 6 chiffres pour bloquer un préfixe."
+                "Début de numéro trop court",
+                "Indiquez au moins 6 chiffres pour bloquer un début de numéro."
             )
         case .budgetExceeded:
             feedback = .warning(
                 icon: "exclamationmark.triangle",
                 "Liste pleine",
-                "Le total de numéros personnalisés dépasse la limite de sécurité."
+                "Vous avez atteint le nombre maximum de numéros."
             )
         }
     }
