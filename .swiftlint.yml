@@ -1,0 +1,25 @@
+# swiftlint config — https://github.com/realm/SwiftLint
+included:
+  - App
+  - Blocker
+  - SilenciaKit/Sources
+  - SilenciaKit/Tests
+excluded:
+  - .build
+  - DerivedData
+  - SilenciaKit/.build
+
+disabled_rules:
+  - todo                 # planning docs reference TODOs intentionally
+  - trailing_comma       # swiftformat owns comma style
+
+line_length:
+  warning: 110
+  error: 140
+
+identifier_name:
+  min_length: 2          # allow short domain names like `a`, `b` in tests is off; `id`, `os` ok
+  excluded: [id, i, x, y]
+
+type_name:
+  min_length: 3

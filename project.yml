@@ -1,0 +1,81 @@
+# XcodeGen spec — the .xcodeproj is generated from this file, never hand-edited.
+# Regenerate with: scripts/gen.sh   (or `xcodegen generate`)
+#
+# Why XcodeGen: a .pbxproj is not reliably editable by an AI agent (or humans).
+# Keeping the project as declarative YAML means every target, dependency, and
+# build setting is diffable, reviewable, and reproducible.
+name: Silencia
+
+options:
+  bundleIdPrefix: com.silencia
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # Simulator builds need no signing team; this keeps the harness team-agnostic.
+    # Device/TestFlight builds override these via an .xcconfig or CI settings.
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGN_IDENTITY: ""
+    DEVELOPMENT_TEAM: ""
+
+packages:
+  SilenciaKit:
+    path: SilenciaKit
+
+targets:
+  Silencia:
+    type: application
+    platform: iOS
+    sources:
+      - App
+    dependencies:
+      - package: SilenciaKit
+      - target: SilenciaBlocker
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.silencia.app
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_CFBundleDisplayName: Silencia
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: "YES"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        TARGETED_DEVICE_FAMILY: "1"
+    entitlements:
+      path: App/Silencia.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.silencia.shared
+
+  SilenciaBlocker:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Blocker
+    dependencies:
+      - package: SilenciaKit
+    info:
+      path: Blocker/Info.plist
+      properties:
+        CFBundleDisplayName: SilenciaBlocker
+        # Keep the extension's version in lockstep with the parent app (Apple requires a match).
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.callkit.call-directory
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).CallDirectoryHandler
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.silencia.app.blocker
+    entitlements:
+      path: Blocker/SilenciaBlocker.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.silencia.shared

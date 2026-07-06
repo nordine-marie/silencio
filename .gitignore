@@ -1,0 +1,23 @@
+# --- Build output ---
+# SwiftPM build dir + our DerivedData (scripts/_config.sh points here)
+.build/
+DerivedData/
+build/
+*.xcresult
+
+# --- Generated Xcode project (regenerate with scripts/gen.sh from project.yml) ---
+*.xcodeproj
+*.xcworkspace
+
+# --- Xcode / SwiftPM local state ---
+xcuserdata/
+*.xcuserstate
+.swiftpm/
+Package.resolved
+
+# --- Harness scratch ---
+.context/screenshots/
+*.log
+
+# --- macOS ---
+.DS_Store
