@@ -1,25 +1,31 @@
-import XCTest
 @testable import SilenciaKit
+import XCTest
 
 final class SharedConfigTests: XCTestCase {
-    func testFreeConfigPlanGatesToSampleRangesPlusUserRuns() {
-        let userRun = BlockingRun(base: 33_612_345_678, count: 1) // a custom mobile
-        let config = SharedConfig(tier: .free, rangeData: .bundledDefault, userRuns: [userRun])
-        let plan = config.plan()
-        // 2 free ranges (2,000,000) + 1 custom number, none overlapping.
-        XCTAssertEqual(plan.totalEntries, 2_000_001)
+    func testPlanCoversEveryRangePlusUserEntries() throws {
+        let entry = try XCTUnwrap(BlockEntry(raw: "06 12 34 56 78")) // a custom mobile
+        let config = SharedConfig(rangeData: .bundledDefault, userEntries: [entry])
+        // Paid upfront: every install blocks all 12 ranges + the custom number.
+        XCTAssertEqual(config.plan().totalEntries, 12_000_001)
     }
 
-    func testLifetimeConfigPlanCoversEverything() {
-        let config = SharedConfig(tier: .lifetime, rangeData: .bundledDefault)
+    func testPlanCoversEverythingWithNoUserEntries() {
+        let config = SharedConfig(rangeData: .bundledDefault)
         XCTAssertEqual(config.plan().totalEntries, 12_000_000)
     }
 
-    func testConfigRoundTripsThroughCodable() throws {
-        let config = SharedConfig(
-            tier: .lifetime,
+    func testUserPrefixEntryExpandsInPlan() throws {
+        let config = try SharedConfig(
             rangeData: .bundledDefault,
-            userRuns: [BlockingRun(base: 33_612_345_678, count: 1)]
+            userEntries: [XCTUnwrap(BlockEntry(raw: "08 99 70"))] // 10,000-number span
+        )
+        XCTAssertEqual(config.plan().totalEntries, 12_010_000)
+    }
+
+    func testConfigRoundTripsThroughCodable() throws {
+        let config = try SharedConfig(
+            rangeData: .bundledDefault,
+            userEntries: [XCTUnwrap(BlockEntry(raw: "06 12 34 56 78"))]
         )
         let data = try JSONEncoder().encode(config)
         let decoded = try JSONDecoder().decode(SharedConfig.self, from: data)

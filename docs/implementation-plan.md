@@ -14,7 +14,6 @@
 │  ├─ Onboarding & activation flow                    │
 │  ├─ Dashboard (protection status)                   │
 │  ├─ Custom block list management                    │
-│  ├─ StoreKit 2 (lifetime IAP)                       │
 │  └─ RangeStore (Arcep ranges + user entries)        │
 │           │ App Group (shared container)            │
 │           ▼                                         │
@@ -35,7 +34,7 @@
 | Language/UI | Swift 6 / SwiftUI | Solo-friendly, modern, iOS 16+ target |
 | Min iOS version | iOS 16 | Covers ~95% of FR devices in 2026; keeps CallKit APIs modern |
 | Persistence | JSON files in App Group container | Tiny data; no Core Data/SwiftData overhead needed |
-| IAP | StoreKit 2 | async/await API, simple non-consumable flow |
+| Purchase model | Paid upfront — **no IAP, no StoreKit** | Buying the app is the lifetime deal (business-plan.md §1) |
 | Backend | **None** (static JSON on CDN, e.g. Cloudflare Pages/R2) | Zero server cost, zero personal data |
 | Analytics | App Store Connect only | Privacy covenant |
 | CI | Xcode Cloud (free tier) | Simplest for solo dev |
@@ -114,10 +113,11 @@ for range in ranges.sorted(by: { $0.base < $1.base }) {
   - Latest iPhone
   - Each: cold full load, incremental add, incremental remove, interrupted load (force reload mid-write), extension disabled → re-enabled.
 
-### 2.6 Free-tier gating
+### 2.6 No tier gating
 
-- Free tier blocks 2 ranges (09 48, 09 49 — the most notorious) → 2M entries.
-- Entitlement check happens in the **main app**, which writes the "active ranges" config to the App Group; the extension just reads config. (StoreKit checks inside the extension are unreliable/inappropriate.)
+The app is paid upfront (business-plan.md supersedes the freemium model of spec v0.1): every
+install streams **all** ranges plus the user's entries. There is no entitlement state anywhere —
+the App Group config carries only range data and custom entries.
 
 ## 3. Main app
 
@@ -130,12 +130,10 @@ Silencia/
 │  ├─ Onboarding/          // promise → explainer → activation → success
 │  ├─ Dashboard/           // status hero, ranges list, update date
 │  ├─ BlockList/           // custom numbers & prefixes CRUD
-│  ├─ Paywall/             // lifetime IAP screen
-│  └─ Settings/            // restore, privacy policy, FAQ, support
+│  └─ Settings/            // privacy policy, FAQ, support
 ├─ Core/
 │  ├─ RangeStore/          // ranges.json load/validate/refresh, App Group IO
 │  ├─ ExtensionBridge/     // CXCallDirectoryManager status + reload orchestration
-│  ├─ Purchases/           // StoreKit 2 wrapper, entitlement cache
 │  └─ DesignSystem/        // colors, type, components
 └─ SilenciaBlocker/        // the extension target
 ```
@@ -158,13 +156,11 @@ Silencia/
 - On app foreground (throttled to 1×/week): fetch `ranges.json` from CDN, verify Ed25519 signature against a public key pinned in the app, compare `version`, apply → incremental extension reload + optional local notification (opt-in) « Mise à jour Arcep appliquée ».
 - Failure mode: silent; bundled ranges always work. The app never *requires* network.
 
-### 3.5 Paywall & StoreKit 2
+### 3.5 Purchases
 
-- One product: `silencia.lifetime` (non-consumable).
-- `Transaction.currentEntitlements` on launch → cache in App Group.
-- Restore purchases button (App Review requirement).
-- Price displayed via StoreKit views to get locale/VAT right.
-- Family Sharing: **enable** for the IAP — supports the "gift to parents" use case at the cost of some revenue; strategically correct.
+None in-app. The app is paid upfront on the App Store; Apple handles payment, refunds, and
+re-downloads. Enable **Family Sharing for the app itself** in App Store Connect — supports the
+"gift to parents" use case at the cost of some revenue; strategically correct.
 
 ## 4. SMS filtering (v1.x, scoped now)
 
@@ -196,7 +192,6 @@ Solo developer, part-time (~10–15 h/week assumed). Sequenced for de-risking: t
 - [ ] Custom block list CRUD with incremental reloads.
 
 ### Phase 2 — Monetization & polish (weeks 6–8)
-- [ ] StoreKit 2 integration, paywall, free-tier gating (2 ranges), restore.
 - [ ] Design system pass, French copywriting, accessibility (VoiceOver on onboarding — senior audience), Dynamic Type.
 - [ ] Settings, FAQ (incl. "pourquoi ça marche" and collateral-blocking note), privacy policy.
 - [ ] Remote ranges refresh + signature verification.
@@ -216,6 +211,6 @@ Solo developer, part-time (~10–15 h/week assumed). Sequenced for de-risking: t
 ## 7. Open questions
 
 1. **Name availability:** reserve "Silencia" in App Store Connect immediately; INPI/EUIPO search before spending on brand assets. Fallbacks: Raccroche, Tranquille.
-2. **Price test:** 9,99 € vs 12,99 € lifetime — consider launching at 6,99 € promo and raising; lifetime pricing is hard to lower later without angering early buyers (it isn't — raising is the safe direction).
+2. **Price:** 5,99 € at launch per `business-plan.md` §2.2; revisit at +6 months. Raising is safe; lowering annoys early buyers.
 3. **Progress reporting** during first load: ship indeterminate, measure complaints, add App Group progress file only if needed.
 4. **iOS 26 CallKit changes:** verify at Xcode beta time whether Call Directory APIs or Settings paths changed; the activation screenshots must match the current iOS Settings layout at launch.

@@ -1,5 +1,5 @@
-import XCTest
 @testable import SilenciaKit
+import XCTest
 
 final class RangeDataTests: XCTestCase {
     func testBundledDefaultIsValidAndCoversTwelveMillion() throws {
@@ -17,7 +17,7 @@ final class RangeDataTests: XCTestCase {
 
     func testValidationRejectsMalformedPrefix() {
         let bad = RangeData(version: 1, updated: "2026-01-01", ranges: [
-            ArcepRange(prefix: "3316", label: "bad"), // only 4 digits
+            ArcepRange(prefix: "3316", label: "bad") // only 4 digits
         ])
         XCTAssertThrowsError(try bad.validate()) { error in
             XCTAssertEqual(error as? RangeData.ValidationError, .malformedPrefix("3316"))
@@ -28,7 +28,7 @@ final class RangeDataTests: XCTestCase {
         // Two identical prefixes overlap.
         let bad = RangeData(version: 1, updated: "2026-01-01", ranges: [
             ArcepRange(prefix: "33162", label: "01 62"),
-            ArcepRange(prefix: "33162", label: "dup"),
+            ArcepRange(prefix: "33162", label: "dup")
         ])
         XCTAssertThrowsError(try bad.validate())
     }
@@ -41,8 +41,8 @@ final class RangeDataTests: XCTestCase {
     }
 
     func testArcepRangeBaseAndRun() {
-        let r = ArcepRange(prefix: "33948", label: "09 48")
-        XCTAssertEqual(r.base, 33_948_000_000)
-        XCTAssertEqual(r.run, BlockingRun(base: 33_948_000_000, count: 1_000_000))
+        let range = ArcepRange(prefix: "33948", label: "09 48")
+        XCTAssertEqual(range.base, 33_948_000_000)
+        XCTAssertEqual(range.run, BlockingRun(base: 33_948_000_000, count: 1_000_000))
     }
 }

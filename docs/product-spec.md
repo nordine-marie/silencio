@@ -76,11 +76,11 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 - Last data update date.
 - Simple French copy explaining *why* this works (Arcep regulation) — builds trust in the deterministic claim.
 
-**F5 — Lifetime purchase**
-- Distribution model: **free download + one-time non-consumable IAP** («Silencia à vie»).
-- Free tier: blocks 2 of the 12 ranges (enough to prove it works) + 5 custom numbers.
-- Lifetime unlock: all ranges + unlimited custom entries. Target price: **9,99 €** (launch: 6,99 € promo).
-- Rationale for freemium-over-paid-upfront: paid-upfront apps convert terribly cold; the free tier lets word-of-mouth and press drive installs, and the demonstrated blocking creates the upgrade moment.
+**F5 — Lifetime by design (paid upfront)**
+- Distribution model: **paid-upfront App Store purchase** — buying the app *is* «Silencia à vie». No IAP, no subscription, no free tier, no StoreKit code.
+- Launch price: **5,99 €** (see `business-plan.md` §2.2; raising later is safe, lowering is not).
+- Every install blocks all 12 ranges and allows unlimited custom entries from the first launch.
+- Rationale (see `business-plan.md`, which supersedes the freemium model of earlier drafts): one price makes the anti-subscription promise literal, kills the paywall/gating surface entirely, and positions against Begone Premium («moins cher que 3 mois de Begone Premium, à vie, sans rien configurer»).
 
 ### 6.2 v1.x (fast follows)
 
@@ -103,12 +103,12 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 2. **How it works (1 screen, skippable):** the Arcep explanation in 2 sentences. Builds trust, not required reading.
 3. **Activation screen:** THE screen. Big button « Ouvrir les Réglages » (deep link as far as iOS allows), followed by illustrated steps. App detects activation on return.
 4. **Success state:** « ✅ 12 millions de numéros bloqués. Vous n'entendrez plus jamais un démarcheur. »
-5. Free tier active; upgrade prompt is present but not blocking.
+5. Done — the app is already complete. Nothing to buy, nothing to configure.
 
 ### 7.2 Upgrade flow
 
-- Trigger points: attempting to enable a locked range, adding a 6th custom number, or the settings "Passer à vie" row.
-- Single screen: price, « une fois, pour toujours », restore purchases link, no dark patterns, no countdown timers. The anti-subscription positioning must be credible.
+None. The app is paid upfront (F5): there is no locked state, no paywall, no restore flow. The
+anti-subscription positioning is structural — there is literally nothing else to sell in-app.
 
 ### 7.3 Steady state
 
@@ -116,10 +116,10 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 
 ## 8. Business model
 
-- **One-time IAP: 9,99 €** (non-consumable). Launch promo 6,99 €.
+- **Paid-upfront app: 5,99 €** on the App Store (no IAP of any kind). Pricing analysis in `business-plan.md` §2.2.
 - No subscription, no ads, no data monetization — ever. This is a brand covenant, stated verbatim on the App Store page.
 - Unit economics: no server costs beyond a static CDN file (~negligible). Support via email. Sustainable at low volume; the lifetime model works *because* marginal cost per user ≈ 0.
-- Revenue expectations (order of magnitude): Begone's category proves French willingness to pay for this. 1,000 sales/month at 9,99 € ≈ 7 k€/month net of Apple's 15% (Small Business Program). This is a side-product, not a venture.
+- Revenue expectations: see `business-plan.md` §3–4 (net ≈ 4,24 €/sale under the Small Business Program). This is a side-product, not a venture.
 
 ## 9. Naming, brand, App Store
 
@@ -142,7 +142,7 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 | Metric | Target (6 months post-launch) |
 |---|---|
 | Activation rate (extension enabled / installs) | > 70% |
-| Free → lifetime conversion | > 8% |
+| App Store page conversion (views → sales) | benchmark & optimize (no target yet) |
 | App Store rating (FR) | ≥ 4.7 |
 | Refund rate | < 2% |
 | Support tickets per 1,000 users | < 5 |

@@ -1,27 +1,32 @@
 import Foundation
 
 /// The single source of truth shared between the app and the extension via the
-/// App Group container. The app owns writes (entitlement, active ranges, user
-/// entries); the extension only reads it (implementation-plan.md §2.6, §3.3).
+/// App Group container. The app owns writes (range data, user entries); the
+/// extension only reads it (implementation-plan.md §3.3).
+///
+/// Silencia is paid upfront (business-plan.md): there is no tier or entitlement —
+/// every install blocks every range.
 ///
 /// `plan()` is pure and unit-tested; the file IO is a thin, failure-tolerant layer.
 public struct SharedConfig: Codable, Equatable, Sendable {
-    public var tier: Tier
     public var rangeData: RangeData
-    /// Custom numbers/prefixes the user added, already normalized to runs.
-    public var userRuns: [BlockingRun]
+    /// Custom numbers/prefixes the user added (F3), with display metadata.
+    public var userEntries: [BlockEntry]
 
-    public init(tier: Tier, rangeData: RangeData, userRuns: [BlockingRun] = []) {
-        self.tier = tier
+    public init(rangeData: RangeData, userEntries: [BlockEntry] = []) {
         self.rangeData = rangeData
-        self.userRuns = userRuns
+        self.userEntries = userEntries
     }
 
-    /// The blocking plan implied by this config: entitlement-gated Arcep ranges
-    /// merged with the user's entries.
+    /// The user's entries as bare runs — what the plan merges into the stream.
+    public var userRuns: [BlockingRun] {
+        userEntries.map(\.run)
+    }
+
+    /// The blocking plan implied by this config: all Arcep ranges merged with the
+    /// user's entries.
     public func plan() -> BlockingPlan {
-        let active = Entitlement.activeRanges(from: rangeData.ranges, tier: tier)
-        return BlockingPlan(arcepRanges: active, userRuns: userRuns)
+        BlockingPlan(arcepRanges: rangeData.ranges, userRuns: userRuns)
     }
 }
 

@@ -17,7 +17,9 @@ public struct BlockingRun: Equatable, Hashable, Sendable, Codable {
     }
 
     /// Inclusive last number in the run.
-    public var upperBound: Int64 { base + count - 1 }
+    public var upperBound: Int64 {
+        base + count - 1
+    }
 
     public func contains(_ number: Int64) -> Bool {
         number >= base && number <= upperBound
