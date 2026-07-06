@@ -38,13 +38,19 @@ struct DashboardView: View {
                         header
 
                         if isProtected {
-                            activeHero
+                            // While the paged load runs, the hero tells the truth:
+                            // the wall is going up, not up yet.
+                            if case let .loading(loaded, total) = model.loadProgress {
+                                loadingHero(loaded: loaded, total: total)
+                            } else {
+                                activeHero
+                            }
                         } else {
                             pausedHero
                         }
 
-                        if model.isReloading {
-                            reloadBanner
+                        if case .failed = model.loadProgress {
+                            failedBanner
                         }
 
                         statRow
@@ -77,7 +83,8 @@ struct DashboardView: View {
         }
         .onChange(of: scenePhase) { phase in
             if phase == .active {
-                Task { await model.refreshExtensionStatus() }
+                // Re-check status AND resume an unfinished paged load (self-healing).
+                Task { await model.onForeground() }
             }
         }
     }
@@ -128,6 +135,51 @@ struct DashboardView: View {
         .shadow(color: Brand.brick.opacity(0.4), radius: 18, y: 10)
     }
 
+    /// The activation-in-progress hero: same brick surface as the active state
+    /// (protection is arriving, not paused), a shield without its checkmark yet,
+    /// and the brick-course progress bar — one brick per Arcep range. The stream
+    /// loads in ascending order and each range spans one million numbers, so a
+    /// full brick means that range is genuinely blocked already.
+    private func loadingHero(loaded: Int64, total: Int64) -> some View {
+        let progress = total > 0 ? Double(loaded) / Double(total) : 0
+        let rangeCount = max(1, model.rangeData.ranges.count)
+        let blockedRanges = min(rangeCount, Int(progress * Double(rangeCount)))
+
+        return VStack(spacing: 16) {
+            Image(systemName: "shield")
+                .font(.system(size: 44, weight: .medium))
+                .foregroundStyle(Brand.cream)
+                .frame(width: 86, height: 86)
+                .background(Brand.cream.opacity(0.16), in: RoundedRectangle(cornerRadius: 26))
+            Text("Activation en cours")
+                .font(.brandTitle)
+                .foregroundStyle(Brand.cream)
+            Text(loadingSubtitle(blockedRanges: blockedRanges, rangeCount: rangeCount))
+                .font(.brandSecondary)
+                .lineSpacing(3)
+                .foregroundStyle(Brand.brickSoft)
+                .multilineTextAlignment(.center)
+            BrickProgressBar(progress: progress, segments: rangeCount)
+                .padding(.top, 8)
+                .animation(.easeInOut(duration: 0.8), value: progress)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .padding(.horizontal, 28)
+        .background(Brand.brick, in: RoundedRectangle(cornerRadius: 28))
+        .shadow(color: Brand.brick.opacity(0.4), radius: 18, y: 10)
+        .accessibilityElement(children: .combine)
+        .accessibilityValue("\(Int(progress * 100)) pour cent")
+    }
+
+    private func loadingSubtitle(blockedRanges: Int, rangeCount: Int) -> String {
+        guard blockedRanges > 0 else {
+            return "Le mur se dresse — première plage en cours de blocage."
+        }
+        let s = blockedRanges > 1 ? "s" : ""
+        return "Le mur se dresse — \(blockedRanges) plage\(s) sur \(rangeCount) déjà bloquée\(s)."
+    }
+
     private var pausedHero: some View {
         VStack(spacing: 16) {
             Image(systemName: "xmark.shield")
@@ -168,14 +220,20 @@ struct DashboardView: View {
             .presentationDetents([.medium, .large])
     }
 
-    private var reloadBanner: some View {
-        HStack(spacing: 10) {
-            ProgressView()
-                .tint(Brand.brick)
-            Text("Chargement des \(FrenchFormat.count(model.activePlan.totalEntries)) de numéros…")
+    private var failedBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Brand.amber)
+            Text("Le chargement des numéros n'a pas abouti.")
                 .font(.system(size: 14))
                 .foregroundStyle(Brand.inkMuted)
             Spacer(minLength: 0)
+            Button("Réessayer") {
+                Task { await model.retrySync() }
+            }
+            .font(.system(size: 14, weight: .bold))
+            .foregroundStyle(Brand.brick)
         }
         .padding(16)
         .card(cornerRadius: 16)
@@ -247,6 +305,40 @@ struct DashboardView: View {
         case 1: "1 ajout personnel"
         default: "\(model.userEntries.count) ajouts personnels"
         }
+    }
+}
+
+/// The signature of the loading state: a course of bricks, one per Arcep range,
+/// filling left to right as the ascending stream loads. The structure encodes the
+/// data — a full brick ⟺ that range is genuinely blocked already.
+struct BrickProgressBar: View {
+    /// Overall fraction loaded, 0…1.
+    let progress: Double
+    /// One brick per range (12 for the bundled Arcep set).
+    let segments: Int
+
+    var body: some View {
+        HStack(spacing: 5) {
+            ForEach(0 ..< segments, id: \.self) { index in
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 3.5)
+                            .fill(Brand.cream.opacity(0.18))
+                        RoundedRectangle(cornerRadius: 3.5)
+                            .fill(Brand.cream)
+                            .frame(width: geo.size.width * fill(of: index))
+                    }
+                }
+            }
+        }
+        .frame(height: 10)
+        .accessibilityHidden(true) // the hero combines and voices the percentage
+    }
+
+    /// How full brick `index` is: the bar fills strictly left to right, mirroring
+    /// the ascending number stream.
+    private func fill(of index: Int) -> Double {
+        min(1, max(0, progress * Double(segments) - Double(index)))
     }
 }
 

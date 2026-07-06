@@ -76,6 +76,12 @@ Each prefix covers 10⁶ numbers → **12,000,000 blocking entries total**.
 
 ### 2.3 Memory strategy (the critical constraint)
 
+> **⚠️ Superseded in part by `paged-loading-plan.md`.** Device testing (2026-07-06) proved a
+> second hard constraint this section missed: CallKit caps each `beginRequest` at
+> **2,000,000 entries** (error Code=5). The single-pass loop sketched below is therefore
+> invalid for the 12M set — entries must be loaded in ≤1.8M pages across multiple
+> app-driven reload rounds. The memory rules below still stand.
+
 The extension runs under a hard memory limit (~12 MB, undocumented; treat 6 MB as the working budget). Rules:
 
 1. **Never materialize the number list.** Generate sequentially:
@@ -99,9 +105,10 @@ for range in ranges.sorted(by: { $0.base < $1.base }) {
 
 ### 2.4 Incremental updates
 
-- First load: full write of 12M entries.
-- Subsequent changes (user adds a number, Arcep update): use `context.isIncremental` — add/remove only deltas via `addBlockingEntry` / `removeBlockingEntry(withPhoneNumber:)`. Near-instant.
-- Keep a `lastAppliedState` hash in the App Group so the extension knows whether to do full vs incremental.
+> **Superseded by `paged-loading-plan.md`** — the first load is itself a sequence of
+> incremental paged requests (7 rounds of ≤1.8M), driven by the app, with a cursor persisted
+> in the App Group (`loader-state.json`). Plan changes trigger a full paged rewrite keyed on a
+> deterministic plan fingerprint; the user-entry delta fast path is its Phase C.
 
 ### 2.5 Load-time expectations & testing matrix
 

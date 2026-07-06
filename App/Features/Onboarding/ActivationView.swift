@@ -102,8 +102,7 @@ struct ActivationView: View {
     }
 
     /// Polls the extension status while the screen is visible (`.task` cancels on
-    /// disappear). On detection: reload the entries (staged progress UI), then the
-    /// success state.
+    /// disappear). On detection: start the paged load, then the success state.
     private func pollForActivation() async {
         while !Task.isCancelled {
             #if targetEnvironment(simulator)
@@ -122,7 +121,11 @@ struct ActivationView: View {
                 await model.refreshExtensionStatus()
             #endif
             if model.extensionStatus.isEnabled {
-                await model.reloadExtension()
+                // Kick the paged load off without blocking the success moment: the
+                // unstructured task survives this screen's dismissal, holds a
+                // background assertion, and BGProcessingTask + foreground resume
+                // finish whatever is left.
+                Task { await model.syncExtension() }
                 onActivated()
                 return
             }

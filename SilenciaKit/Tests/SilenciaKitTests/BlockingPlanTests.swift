@@ -82,24 +82,34 @@ final class BlockingPlanTests: XCTestCase {
         XCTAssertEqual(previous, 33_949_999_999) // last number of the 09 49 range
     }
 
-    // MARK: State hashing (full vs incremental reload)
+    // MARK: Plan fingerprint (cross-process identity of the loaded plan)
 
-    func testStateHashStableAcrossEquivalentPlans() {
+    func testFingerprintStableAcrossEquivalentPlans() {
         let fromRanges = BlockingPlan(arcepRanges: RangeData.bundledDefault.ranges)
         let fromRuns = BlockingPlan(runs: RangeData.bundledDefault.ranges.compactMap(\.run).reversed())
         XCTAssertEqual(
-            fromRanges.stateHash,
-            fromRuns.stateHash,
-            "hash must be order-independent after coalesce"
+            fromRanges.fingerprint,
+            fromRuns.fingerprint,
+            "fingerprint must be order-independent after coalesce"
         )
     }
 
-    func testStateHashChangesWhenPlanChanges() {
+    func testFingerprintChangesWhenPlanChanges() {
         let base = BlockingPlan(arcepRanges: [ArcepRange(prefix: "33948", label: "09 48")])
         let bigger = BlockingPlan(
             arcepRanges: [ArcepRange(prefix: "33948", label: "09 48")],
             userRuns: [BlockingRun(base: 33_612_345_678, count: 1)]
         )
-        XCTAssertNotEqual(base.stateHash, bigger.stateHash)
+        XCTAssertNotEqual(base.fingerprint, bigger.fingerprint)
+    }
+
+    func testFingerprintKnownValue() {
+        // Pins the FNV-1a algorithm to a precomputed constant: the app and the
+        // extension compare fingerprints across processes, so the value can never
+        // drift silently (Swift's `Hasher` is per-process seeded and was replaced
+        // for exactly this reason). Reference: FNV-1a(64) over the little-endian
+        // bytes of Int64(1) then Int64(2).
+        let plan = BlockingPlan(runs: [BlockingRun(base: 1, count: 2)])
+        XCTAssertEqual(plan.fingerprint, 0x7717_9803_63C8_E066)
     }
 }

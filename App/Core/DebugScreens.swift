@@ -10,7 +10,7 @@
     /// Debug builds only; release builds compile none of this.
     enum DebugScreen: String, CaseIterable {
         case promise, how, activation, success
-        case dashboard, paused, blocklist, settings
+        case dashboard, paused, loading, blocklist, settings
 
         static func fromLaunchArguments() -> DebugScreen? {
             for argument in CommandLine.arguments where argument.hasPrefix("--screen=") {
@@ -33,7 +33,7 @@
                 ActivationView(onActivated: {}, onLater: {})
             case .success:
                 SuccessView(onDone: {})
-            case .dashboard, .paused:
+            case .dashboard, .paused, .loading:
                 DashboardView()
             case .blocklist:
                 NavigationStack {

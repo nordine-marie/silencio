@@ -18,11 +18,15 @@ settings:
     SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
-    # Simulator builds need no signing team; this keeps the harness team-agnostic.
-    # Device/TestFlight builds override these via an .xcconfig or CI settings.
-    CODE_SIGNING_ALLOWED: "NO"
-    CODE_SIGNING_REQUIRED: "NO"
-    CODE_SIGN_IDENTITY: ""
+    # Simulator builds stay team-agnostic (no signing), so the headless harness
+    # never needs an Apple team. Device builds (sdk=iphoneos*) sign automatically
+    # with your personal Apple ID team — set DEVELOPMENT_TEAM here (persists across
+    # `scripts/gen.sh`) or pick the team once in Xcode → Signing & Capabilities.
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGNING_ALLOWED[sdk=iphonesimulator*]: "NO"
+    CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]: "NO"
+    CODE_SIGN_IDENTITY: "Apple Development"
+    CODE_SIGN_IDENTITY[sdk=iphonesimulator*]: ""
     DEVELOPMENT_TEAM: ""
 
 packages:
@@ -49,6 +53,14 @@ targets:
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: "YES"
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         TARGETED_DEVICE_FAMILY: "1"
+    info:
+      path: App/Info.plist
+      properties:
+        # Background continuation of the paged Call Directory load
+        # (App/Core/BackgroundSync.swift; paged-loading-plan.md §2.7).
+        UIBackgroundModes: [processing]
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.silencia.app.sync
     entitlements:
       path: App/Silencia.entitlements
       properties:
