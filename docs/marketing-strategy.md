@@ -70,6 +70,16 @@ partenariats) — c'est lui qui rend un paiement à froid acceptable face à un 
    (ils comparent, tombent sur le gratuit) → ne pas y mettre d'acquisition payante frontale
    tant que l'économie unitaire n'est pas prouvée.
 
+### « Senior » n'est pas un bloc — segmenter (voir §7)
+
+| Sous-segment | Comportement | Canaux qui marchent |
+|---|---|---|
+| **Jeunes seniors (≈60-72)** | À l'aise, iPhone, peuvent s'auto-installer | Facebook + presse senior + SEO → App Store |
+| **Seniors 75+** | Peu autonomes sur mobile ; souvent aidés | **Uniquement** famille / assisté / hors-ligne (campagnes D, E, volet physique) |
+
+⚠️ Facteur limitant à vérifier : **la pénétration iPhone chez les seniors FR**. Beaucoup sont
+sur Android → réduit d'autant la cible atteignable pour une app iOS.
+
 ---
 
 ## 4. Le cadrage temporel (la décision clé)
@@ -110,7 +120,10 @@ prêt, tout glisse — mais la vague « la loi ne suffit pas » reste exploitabl
 ### Campagne A — « La loi explique » (SEO + social)
 - **Quand :** publier avant le 11 août, pousser fort autour du 11.
 - **Quoi :** page pilier *« Démarchage : ce qui change le 11 août 2026 (et pourquoi les appels
-  ne vont pas s'arrêter) »* + déclinaisons courtes (carrousels Facebook, Reels).
+  ne vont pas s'arrêter) »* + déclinaisons courtes.
+- **Ciblage senior :** **Facebook** (le seul réseau à forte présence senior, ≈46 % des 65+) et
+  **SEO** (les seniors cherchent « comment bloquer le démarchage »). Les **Reels / vidéo courte
+  restent réservés au grand public** — skew jeune, hors volet senior.
 - **Pourquoi :** aimant à trafic gratuit sur les recherches qui explosent autour du pivot.
   Chaque visiteur → liste d'attente.
 - **KPI :** inscrits waitlist, trafic organique.
@@ -138,6 +151,15 @@ prêt, tout glisse — mais la vague « la loi ne suffit pas » reste exploitabl
   gratuit. **Sans ce canal, le modèle payant plafonne.**
 - ⚠️ Non validé par la recherche (quels partenaires, quels coûts) → à défricher.
 
+### Campagne D-bis — « Prescripteurs physiques / hors-ligne » (indispensable pour les 75+)
+- **Quand :** activation sept-oct, en parallèle de D.
+- **Quoi :** **pharmacies, mairies / France Services (conseillers numériques), clubs et
+  associations seniors** (ex. Générations Mouvement, Petits Frères des Pauvres), **résidences
+  seniors, aidants**. Support papier (flyer, guide pas-à-pas) + relais humain.
+- **Pourquoi :** les seniors sont **cross-canal** (online *+* offline) ; pour les 75+, le
+  physique est souvent le **seul** chemin. Le plan digital seul les rate.
+- ⚠️ Hypothèse non validée — efficacité et coût de chaque prescripteur à tester.
+
 ### Campagne E — « Offrez la tranquillité » (Noël)
 - **Quand :** nov-déc.
 - **Quoi :** positionner l'achat **comme cadeau des enfants aux parents/grands-parents.**
@@ -152,7 +174,44 @@ prêt, tout glisse — mais la vague « la loi ne suffit pas » reste exploitabl
 
 ---
 
-## 7. Priorités, budget & mesure
+## 7. Adaptation aux seniors (audit des canaux)
+
+Brief « seniors first » : voici, canal par canal, ce qui est adapté et ce qui ne l'est pas.
+
+| Campagne / canal | Adapté seniors ? | Pourquoi |
+|---|---|---|
+| A — **Facebook** | ✅ Oui | Seul réseau à forte présence senior (≈46 % des 65+). |
+| A — **Reels / vidéo courte** | ❌ Non | Skew jeune → réservé grand public. |
+| A — **SEO** | 🟡 Moyen | Les seniors cherchent, mais intention « comment faire » ≠ « acheter ». |
+| B — **Presse senior** (Notre Temps, Pleine Vie) | ✅ Fort | Print + prescripteur de confiance. |
+| B — **Presse conso/tech** | 🟡 Grand public | Volume, peu senior. |
+| C — **App Store / ASO** | 🟡 Socle | Canal *pull* : capte la demande, ne recrute pas de seniors. |
+| D — **Mutuelles / assos** | ✅ Le meilleur | Confiance déléguée. Cœur du dispositif. |
+| D-bis — **Prescripteurs physiques** | ✅ Indispensable 75+ | Seul chemin hors-ligne. |
+| E — **Cadeau (enfants → parents)** | ✅✅ Le plus malin | Cible l'enfant comme acheteur. |
+
+### Le facteur limitant : le mur d'activation
+
+Presque tous les canaux déposent le senior devant *« téléchargez l'app payante et activez
+l'extension »*, ce qui cumule **quatre frictions** :
+
+1. avoir un **iPhone** (⚠️ beaucoup de seniors sont sur Android) ;
+2. un **Apple ID avec moyen de paiement** ;
+3. **payer sans essai gratuit**, à froid ;
+4. **activer l'extension CallKit dans les Réglages** — étape pénible même pour les non-seniors.
+
+**Un excellent canal qui dépose le senior devant ce mur convertit mal.** Les seules campagnes
+qui le contournent nativement sont **D** (fait-pour-vous) et **E** (l'enfant paie et installe).
+
+### Mécanisme anti-friction (à coller à CHAQUE campagne)
+
+- **Guide pas-à-pas illustré** (papier + vidéo) : installation *et* activation de l'extension.
+- **Installation assistée** quand un relais humain existe (France Services, aidant, résidence).
+- **Format cadeau** systématiquement mis en avant : l'aidant familial fait l'achat + l'install.
+
+---
+
+## 8. Priorités, budget & mesure
 
 **Priorités par rapport impact/coût :**
 1. **Gratuit et vital :** avis seedés (bêta), ASO, contenu loi, PR (temps > argent).
@@ -168,7 +227,7 @@ prêt, tout glisse — mais la vague « la loi ne suffit pas » reste exploitabl
 
 ---
 
-## 8. Base factuelle (recherche vérifiée)
+## 9. Base factuelle (recherche vérifiée)
 
 Faits ayant passé la vérification contradictoire :
 
@@ -204,7 +263,7 @@ restent des hypothèses — à valider par nos propres tests.
 
 ---
 
-## 9. Questions ouvertes à trancher
+## 10. Questions ouvertes à trancher
 
 1. **Quel prix de l'achat unique ?** Saracroche gratuit exerce une pression déflationniste.
    Le prix concurrent et les benchmarks de conversion ayant été réfutés → à tester nous-mêmes.
@@ -217,7 +276,7 @@ restent des hypothèses — à valider par nos propres tests.
 
 ---
 
-## 10. Prochains pas
+## 11. Prochains pas
 
 - [ ] Rédiger la **fiche App Store complète** (titre, sous-titre, description, mots-clés ASO,
       script des captures).
