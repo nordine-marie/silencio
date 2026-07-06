@@ -41,7 +41,11 @@ struct DashboardView: View {
                             // While the paged load runs, the hero tells the truth:
                             // the wall is going up, not up yet.
                             if case let .loading(loaded, total) = model.loadProgress {
-                                loadingHero(loaded: loaded, total: total)
+                                LoadingHero(
+                                    loaded: loaded,
+                                    total: total,
+                                    rangeCount: max(1, model.rangeData.ranges.count)
+                                )
                             } else {
                                 activeHero
                             }
@@ -133,51 +137,6 @@ struct DashboardView: View {
         .padding(.horizontal, 28)
         .background(Brand.brick, in: RoundedRectangle(cornerRadius: 28))
         .shadow(color: Brand.brick.opacity(0.4), radius: 18, y: 10)
-    }
-
-    /// The activation-in-progress hero: same brick surface as the active state
-    /// (protection is arriving, not paused), a shield without its checkmark yet,
-    /// and the brick-course progress bar — one brick per Arcep range. The stream
-    /// loads in ascending order and each range spans one million numbers, so a
-    /// full brick means that range is genuinely blocked already.
-    private func loadingHero(loaded: Int64, total: Int64) -> some View {
-        let progress = total > 0 ? Double(loaded) / Double(total) : 0
-        let rangeCount = max(1, model.rangeData.ranges.count)
-        let blockedRanges = min(rangeCount, Int(progress * Double(rangeCount)))
-
-        return VStack(spacing: 16) {
-            Image(systemName: "shield")
-                .font(.system(size: 44, weight: .medium))
-                .foregroundStyle(Brand.cream)
-                .frame(width: 86, height: 86)
-                .background(Brand.cream.opacity(0.16), in: RoundedRectangle(cornerRadius: 26))
-            Text("Activation en cours")
-                .font(.brandTitle)
-                .foregroundStyle(Brand.cream)
-            Text(loadingSubtitle(blockedRanges: blockedRanges, rangeCount: rangeCount))
-                .font(.brandSecondary)
-                .lineSpacing(3)
-                .foregroundStyle(Brand.brickSoft)
-                .multilineTextAlignment(.center)
-            BrickProgressBar(progress: progress, segments: rangeCount)
-                .padding(.top, 8)
-                .animation(.easeInOut(duration: 0.8), value: progress)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
-        .padding(.horizontal, 28)
-        .background(Brand.brick, in: RoundedRectangle(cornerRadius: 28))
-        .shadow(color: Brand.brick.opacity(0.4), radius: 18, y: 10)
-        .accessibilityElement(children: .combine)
-        .accessibilityValue("\(Int(progress * 100)) pour cent")
-    }
-
-    private func loadingSubtitle(blockedRanges: Int, rangeCount: Int) -> String {
-        guard blockedRanges > 0 else {
-            return "Le mur se dresse — première plage en cours de blocage."
-        }
-        let s = blockedRanges > 1 ? "s" : ""
-        return "Le mur se dresse — \(blockedRanges) plage\(s) sur \(rangeCount) déjà bloquée\(s)."
     }
 
     private var pausedHero: some View {
@@ -304,6 +263,83 @@ struct DashboardView: View {
         case 0: "Ajouter un numéro ou un préfixe"
         case 1: "1 ajout personnel"
         default: "\(model.userEntries.count) ajouts personnels"
+        }
+    }
+}
+
+/// The activation-in-progress hero: same brick surface as the active state
+/// (protection is arriving, not paused), a shield without its checkmark yet, and
+/// the brick-course progress bar — one brick per Arcep range.
+///
+/// The loader's real cursor advances in ~1.8M-entry jumps (one per reload round),
+/// which would fill ~1.8 bricks at once and then sit still for seconds. A
+/// `SmoothedProgress` (tested headless in SilenciaKit) eases a *displayed*
+/// fraction toward that real target every frame, so the wall rises evenly and
+/// continuously. It never leads the real cursor, so a full brick still means that
+/// range is genuinely blocked already.
+private struct LoadingHero: View {
+    let loaded: Int64
+    let total: Int64
+    let rangeCount: Int
+
+    @State private var smoother = SmoothedProgress()
+    @State private var lastTick: Date?
+
+    /// A per-frame heartbeat while the load runs; drives the eased fill.
+    private let ticker = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common).autoconnect()
+
+    private var realFraction: Double {
+        total > 0 ? Double(loaded) / Double(total) : 0
+    }
+
+    /// The count is derived from the *displayed* fraction so the caption and the
+    /// bar always agree — and since the display trails the real cursor, it can
+    /// only ever under-claim, never announce a range as blocked too early.
+    private var blockedRanges: Int {
+        min(rangeCount, Int(smoother.displayed * Double(rangeCount)))
+    }
+
+    private var subtitle: String {
+        guard blockedRanges > 0 else {
+            return "Le mur se dresse — première plage en cours de blocage."
+        }
+        let s = blockedRanges > 1 ? "s" : ""
+        return "Le mur se dresse — \(blockedRanges) plage\(s) sur \(rangeCount) déjà bloquée\(s)."
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "shield")
+                .font(.system(size: 44, weight: .medium))
+                .foregroundStyle(Brand.cream)
+                .frame(width: 86, height: 86)
+                .background(Brand.cream.opacity(0.16), in: RoundedRectangle(cornerRadius: 26))
+            Text("Activation en cours")
+                .font(.brandTitle)
+                .foregroundStyle(Brand.cream)
+            Text(subtitle)
+                .font(.brandSecondary)
+                .lineSpacing(3)
+                .foregroundStyle(Brand.brickSoft)
+                .multilineTextAlignment(.center)
+            BrickProgressBar(progress: smoother.displayed, segments: rangeCount)
+                .padding(.top, 8)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .padding(.horizontal, 28)
+        .background(Brand.brick, in: RoundedRectangle(cornerRadius: 28))
+        .shadow(color: Brand.brick.opacity(0.4), radius: 18, y: 10)
+        .accessibilityElement(children: .combine)
+        .accessibilityValue("\(Int(smoother.displayed * 100)) pour cent")
+        .onAppear { smoother.retarget(to: realFraction) }
+        .onChange(of: realFraction) { newValue in smoother.retarget(to: newValue) }
+        .onReceive(ticker) { now in
+            // Wall-clock delta, clamped so a frame dropped while backgrounded
+            // can't jerk the bar forward on resume.
+            let dt = lastTick.map { min(now.timeIntervalSince($0), 0.1) } ?? 0
+            lastTick = now
+            smoother.advance(by: dt)
         }
     }
 }
