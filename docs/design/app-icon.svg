@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Silencia app icon — source of truth for every AppIcon.appiconset PNG.
+       Full-bleed square: iOS applies the rounded-corner mask itself.
+       Colors are the design-system Brand values (DesignSystem.swift):
+       background = Brand.brick #A8443A, glyph = Brand.surface #FCFBF8.
+       The glyph is the hexagonal “S” monogram: a single 64-unit stroke with
+       mitered corners and end caps cut parallel to the middle diagonal,
+       point-symmetric about the canvas center (512, 512).
+       Regenerate the PNGs with scripts/icons.sh after editing. -->
+  <rect width="1024" height="1024" fill="#A8443A"/>
+  <path fill="#FCFBF8" d="M794 470.7 L794 311.8 L512 144.8 L230 311.8 L230 486 L730 590 L730 675.8 L512 804.8 L294 675.8 L294 566.7 L230 553.3 L230 712.2 L512 879.2 L794 712.2 L794 538 L294 434 L294 348.2 L512 219.2 L730 348.2 L730 457.3 Z"/>
+</svg>

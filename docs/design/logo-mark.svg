@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="230 144.8 564 734.4">
+  <!-- Silencia logo mark (glyph only) — same geometry as app-icon.svg, tight
+       viewBox, black fill so the asset catalog can treat it as a template
+       image and SwiftUI can tint it with foregroundStyle. A copy lives in
+       App/Assets.xcassets/LogoMark.imageset; keep the two in sync. -->
+  <path fill="#000000" d="M794 470.7 L794 311.8 L512 144.8 L230 311.8 L230 486 L730 590 L730 675.8 L512 804.8 L294 675.8 L294 566.7 L230 553.3 L230 712.2 L512 879.2 L794 712.2 L794 538 L294 434 L294 348.2 L512 219.2 L730 348.2 L730 457.3 Z"/>
+</svg>

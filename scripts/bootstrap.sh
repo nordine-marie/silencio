@@ -16,6 +16,14 @@ if [ "${#to_install[@]}" -gt 0 ]; then
   brew install "${to_install[@]}"
 fi
 
+# librsvg ships the rsvg-convert binary scripts/icons.sh uses (formula name ≠ command name).
+if command -v rsvg-convert >/dev/null 2>&1; then
+  ok "rsvg-convert already installed"
+else
+  info "Installing: librsvg"
+  brew install librsvg
+fi
+
 info "Generating Xcode project"
 "$ROOT/scripts/gen.sh"
 

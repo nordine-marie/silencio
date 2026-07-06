@@ -12,9 +12,11 @@ struct PromiseView: View {
                 Spacer()
 
                 VStack(spacing: 30) {
-                    Image(systemName: "checkmark.shield")
-                        .font(.system(size: 62, weight: .medium))
-                        .foregroundStyle(Brand.cream)
+                    Image("LogoMark")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 72)
+                        .foregroundStyle(Brand.surface)
                         .frame(width: 132, height: 132)
                         .background(Brand.brick, in: RoundedRectangle(cornerRadius: 36))
                         .shadow(color: Brand.brick.opacity(0.45), radius: 20, y: 12)
