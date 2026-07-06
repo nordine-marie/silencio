@@ -1,4 +1,4 @@
-# Silencio — Product Specification
+# Silencia — Product Specification
 
 **Version:** 0.1 (Draft)
 **Date:** July 2026
@@ -9,9 +9,9 @@
 
 ## 1. Vision
 
-**Silencio is the "install and forget" telemarketing blocker for France.**
+**Silencia is the "install and forget" telemarketing blocker for France.**
 
-One-time purchase. Zero configuration. You install it, flip one switch, and every French telemarketing call is silenced forever — because in France, telemarketers are *legally required* to call from known number ranges (Arcep decision, effective January 1, 2023). Silencio exploits this regulatory quirk to deliver deterministic blocking, not heuristic guessing.
+One-time purchase. Zero configuration. You install it, flip one switch, and every French telemarketing call is silenced forever — because in France, telemarketers are *legally required* to call from known number ranges (Arcep decision, effective January 1, 2023). Silencia exploits this regulatory quirk to deliver deterministic blocking, not heuristic guessing.
 
 **Tagline (FR):** « Installez. Activez. Tranquille à vie. »
 **Tagline (EN, internal):** "Install it once. Silence forever."
@@ -24,7 +24,7 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 
 ## 3. Positioning
 
-| | **Silencio** | Begone | Orange Téléphone |
+| | **Silencia** | Begone | Orange Téléphone |
 |---|---|---|---|
 | Setup | Zero-config, all Arcep ranges pre-enabled | User selects ranges | Account-lite, ads/data model |
 | Business model | **One-time lifetime purchase** | Paid app | Free (Orange-funded) |
@@ -49,7 +49,7 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 1. **Zero decisions by default.** Every mandatory choice in onboarding is a failure.
 2. **The only hard step is Apple's fault — own it.** iOS requires the user to manually enable the extension in Settings. This is the single point of friction; the entire onboarding is engineered around making that one step foolproof.
 3. **Show, don't configure.** The main screen shows what's being blocked (counter of blocked ranges, blocked-call stats where available), not settings.
-4. **Lifetime means lifetime.** Arcep range updates ship as free app updates. No "Silencio 2" upsell for the core promise.
+4. **Lifetime means lifetime.** Arcep range updates ship as free app updates. No "Silencia 2" upsell for the core promise.
 
 ## 6. Feature set
 
@@ -62,7 +62,7 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 - Ranges stored as data (remote-configurable via signed static JSON on CDN) so future Arcep changes don't require an App Store review cycle to *define*, only to *ship* (the extension reload happens locally).
 
 **F2 — Guided extension activation**
-- Step-by-step onboarding with annotated screenshots/animation for: Settings → Apps → Phone → Call Blocking & Identification → enable Silencio.
+- Step-by-step onboarding with annotated screenshots/animation for: Settings → Apps → Phone → Call Blocking & Identification → enable Silencia.
 - Live status detection: app polls `CXCallDirectoryManager.getEnabledStatus` and celebrates ("✅ Vous êtes protégé") the moment the user returns with the extension enabled.
 - If disabled, the home screen shows a persistent, friendly call-to-action — never a silent failure.
 
@@ -77,7 +77,7 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 - Simple French copy explaining *why* this works (Arcep regulation) — builds trust in the deterministic claim.
 
 **F5 — Lifetime purchase**
-- Distribution model: **free download + one-time non-consumable IAP** («Silencio à vie»).
+- Distribution model: **free download + one-time non-consumable IAP** («Silencia à vie»).
 - Free tier: blocks 2 of the 12 ranges (enough to prove it works) + 5 custom numbers.
 - Lifetime unlock: all ranges + unlimited custom entries. Target price: **9,99 €** (launch: 6,99 € promo).
 - Rationale for freemium-over-paid-upfront: paid-upfront apps convert terribly cold; the free tier lets word-of-mouth and press drive installs, and the demonstrated blocking creates the upgrade moment.
@@ -123,8 +123,8 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 
 ## 9. Naming, brand, App Store
 
-- **Name:** Silencio.
-- **App Store title:** « Silencio : Anti-Démarchage » (brand + keyword).
+- **Name:** Silencia.
+- **App Store title:** « Silencia : Anti-Démarchage » (brand + keyword).
 - **Subtitle:** « Bloqueur d'appels commerciaux » .
 - **Keywords:** démarchage, bloquer, appels, spam, téléphone, arcep, bloctel, indésirable.
 - **Locale:** fr-FR primary; en-US secondary (minimal).
@@ -135,7 +135,7 @@ One-time purchase. Zero configuration. You install it, flip one switch, and ever
 - Blocking Arcep-designated ranges is lawful: these prefixes are *allocated* to commercial prospecting platforms by regulation; blocking them cannot suppress legitimate personal calls by design.
 - **Edge case to document in FAQ:** legitimate non-telemarketing services could theoretically use these ranges in violation of the numbering plan — collateral blocking is acceptable and the responsibility lies with the caller's numbering compliance.
 - Privacy: no personal data processed off-device → minimal GDPR surface. Privacy policy still required (App Store) — state that custom block lists never leave the device.
-- Trademark: run INPI/EUIPO search on "Silencio" in relevant Nice classes (9, 38, 42) before launch. Known conflict risk: "Silencio" is a common word; check app-name availability on App Store Connect early (name reservation).
+- Trademark: run INPI/EUIPO search on "Silencia" in relevant Nice classes (9, 38, 42) before launch. Known conflict risk: "Silencia" is a common word; check app-name availability on App Store Connect early (name reservation).
 
 ## 11. Success metrics
 
@@ -154,7 +154,7 @@ Activation rate is the metric that matters most: it measures the OOB promise. In
 | Risk | Likelihood | Mitigation |
 |---|---|---|
 | Arcep changes/extends ranges | Medium | Ranges as remote data; free updates; changelog feature |
-| Regulation makes ranges obsolete (e.g., outright ban on cold calling) | Low/Medium | The proposed 2026+ opt-in consent law would *reduce* démarchage; Silencio pivots messaging to "blocks the outlaws" — offenders won't respect consent either |
+| Regulation makes ranges obsolete (e.g., outright ban on cold calling) | Low/Medium | The proposed 2026+ opt-in consent law would *reduce* démarchage; Silencia pivots messaging to "blocks the outlaws" — offenders won't respect consent either |
 | Apple rejects mass-blocking extension | Low | Begone precedent exists; ranges are regulator-defined, defensible in review notes |
 | Extension memory crash on older devices | Medium | Streaming writes, chunked incremental loads, hard testing on oldest supported hardware (see implementation plan) |
 | Begone copies OOB positioning | Medium | Compete on brand, lifetime pricing clarity, and polish; the moat is thin — speed matters |

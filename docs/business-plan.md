@@ -1,9 +1,9 @@
-# Silencio — Business Plan
+# Silencia — Business Plan
 
 **Version:** 0.1 (Draft)
 **Date:** July 2026
 **Model:** Paid-upfront iOS app, French market
-**Companion docs:** `silencio-product-spec.md`, `silencio-implementation-plan.md`
+**Companion docs:** `product-spec.md`, `implementation-plan.md`
 
 > ⚠️ This version supersedes the freemium model in the product spec v0.1. Business model is now **paid upfront** (buy the app once on the App Store, own it forever). The spec's paywall/free-tier sections (F5, §6.1, §7.2) must be updated accordingly — this simplifies the build (no StoreKit paywall, no gating logic).
 
@@ -11,12 +11,12 @@
 
 ## 1. Executive summary
 
-Silencio is a one-time-purchase iOS app that deterministically blocks French telemarketing calls using the Arcep-mandated prospecting number ranges. Zero configuration, zero data collection, zero recurring cost.
+Silencia is a one-time-purchase iOS app that deterministically blocks French telemarketing calls using the Arcep-mandated prospecting number ranges. Zero configuration, zero data collection, zero recurring cost.
 
 **The single most important strategic fact:** on **August 11, 2026 — five weeks from now — the law of June 30, 2025 (loi n° 2025-594) makes all unsolicited telemarketing illegal without prior opt-in consent, and Bloctel shuts down permanently.** This event is simultaneously:
 
 - **The biggest marketing opportunity this product will ever have.** Massive national press coverage is guaranteed; millions of Bloctel registrants become "orphaned" and will search for alternatives; the keyword "bloctel" becomes a free acquisition channel pointing at a dead service.
-- **The core thesis risk.** "Telemarketing is now banned anyway — why pay for a blocker?" The counter-narrative (and it is true) is: consent-based and fraudulent calls continue, enforcement is weak, and the legal callers *still must use the Arcep ranges* — Silencio blocks both the compliant and the annoying-but-consented.
+- **The core thesis risk.** "Telemarketing is now banned anyway — why pay for a blocker?" The counter-narrative (and it is true) is: consent-based and fraudulent calls continue, enforcement is weak, and the legal callers *still must use the Arcep ranges* — Silencia blocks both the compliant and the annoying-but-consented.
 
 **Recommendation: compress the delivery plan to ship before August 11, 2026, even as a v0.9.** Launch timing dominates every other variable in this plan, including marketing budget.
 
@@ -36,7 +36,7 @@ Every euro of revenue above ~150 €/year is margin. The model's weakness is the
 
 ### 2.1 Reference pricing (competitive context)
 
-Begone, the direct competitor, is freemium: free app with manual range configuration, premium at 1,99 €/month, 19,99 €/year, or 79,99 € lifetime. Silencio at 5,99 € one-time is dramatically cheaper than any Begone paid tier while offering a better out-of-box experience. This is a deliberate wedge: "moins cher que 3 mois de Begone Premium, à vie, sans rien configurer."
+Begone, the direct competitor, is freemium: free app with manual range configuration, premium at 1,99 €/month, 19,99 €/year, or 79,99 € lifetime. Silencia at 5,99 € one-time is dramatically cheaper than any Begone paid tier while offering a better out-of-box experience. This is a deliberate wedge: "moins cher que 3 mois de Begone Premium, à vie, sans rien configurer."
 
 ### 2.2 Price sensitivity
 
@@ -59,7 +59,7 @@ Paid-upfront conversion is brutally sensitive to rating and review count in the 
 | **SAM** — iPhone owners willing to *act* (install a blocker) | ~2–4 M | Bloctel had millions of registrants; a fraction are iOS + proactive |
 | **SOM** — realistically reachable buyers over 3 years | **50k–200k** | Paid-app friction cuts hard; category leader precedent |
 
-The honest framing: this is a **niche utility with a real but capped ceiling**. Begone's multi-year presence, strong ratings, and press coverage demonstrate the demand exists; the paid-upfront barrier means Silencio converts a thinner slice of it than a free app would.
+The honest framing: this is a **niche utility with a real but capped ceiling**. Begone's multi-year presence, strong ratings, and press coverage demonstrate the demand exists; the paid-upfront barrier means Silencia converts a thinner slice of it than a free app would.
 
 ## 4. Revenue scenarios
 
@@ -112,7 +112,7 @@ Two structural forces, one negative and one positive:
 | Base | 100 000 – 180 000 € |
 | Optimistic | 300 000 – 500 000 € |
 
-**Read this table honestly:** Silencio is a profitable side product — excellent €/hour for a solo developer with your profile, near-zero running costs, and a compounding brand asset (privacy-first French utility). It is not a venture-scale business, and its ceiling is set by regulation you don't control. It should never compete for Rempart AI's calendar time; its budget is weekends.
+**Read this table honestly:** Silencia is a profitable side product — excellent €/hour for a solo developer with your profile, near-zero running costs, and a compounding brand asset (privacy-first French utility). It is not a venture-scale business, and its ceiling is set by regulation you don't control. It should never compete for Rempart AI's calendar time; its budget is weekends.
 
 ## 5. Marketing plan & budgets
 
@@ -170,14 +170,14 @@ Total year-1 marketing: **3 000 – 10 000 €** depending on ASA performance. T
 | Accounting/legal (micro-entreprise regime) | −500 € |
 | **Pre-tax profit** | **≈ +17 500 €** |
 
-Fiscal note (flagging, not advising): app revenue would flow through whichever structure you choose — micro-entreprise BNC/BIC, or as a product line under a company. Given your PSE/ARE optimization and the planned Lupus Capital holding, where to house Silencio (personal micro vs. SASU subsidiary) has real consequences for ARE maintenance and social charges — worth a session with your expert-comptable before the first euro lands, not after.
+Fiscal note (flagging, not advising): app revenue would flow through whichever structure you choose — micro-entreprise BNC/BIC, or as a product line under a company. Given your PSE/ARE optimization and the planned Lupus Capital holding, where to house Silencia (personal micro vs. SASU subsidiary) has real consequences for ARE maintenance and social charges — worth a session with your expert-comptable before the first euro lands, not after.
 
 ## 7. Risks specific to this business plan
 
 | Risk | Impact | Mitigation |
 |---|---|---|
 | **Miss the Aug 11 window** | Loses the single biggest free-acquisition event; base case drops toward pessimistic | Cut scope ruthlessly: MVP = 12 ranges + activation flow + custom list. Everything else post-launch |
-| **"Le démarchage est interdit, pourquoi payer ?"** | Softens demand from late 2026 | Messaging pivot ready at launch: "La loi interdit. Silencio fait respecter." Illegal/consented calls persist; ranges remain in force for compliant callers |
+| **"Le démarchage est interdit, pourquoi payer ?"** | Softens demand from late 2026 | Messaging pivot ready at launch: "La loi interdit. Silencia fait respecter." Illegal/consented calls persist; ranges remain in force for compliant callers |
 | Enforcement actually works, calls collapse | Long-term demand decay | Accept: harvest, don't invest; Android extends runway |
 | Begone (or Apple) ships one-tap Arcep blocking | Erodes differentiation | Speed + brand + price clarity; no durable moat exists here — plan assumes it |
 | Paid-upfront conversion below assumptions | All scenarios shift down one row | Price drop to 3,99 € as circuit-breaker; or pivot to freemium (keep the code path simple enough to allow it) |

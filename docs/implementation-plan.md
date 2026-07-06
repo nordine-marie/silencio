@@ -1,8 +1,8 @@
-# Silencio — iOS Implementation Plan
+# Silencia — iOS Implementation Plan
 
 **Version:** 0.1 (Draft)
 **Date:** July 2026
-**Companion doc:** `silencio-product-spec.md`
+**Companion doc:** `product-spec.md`
 
 ---
 
@@ -10,7 +10,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ Silencio.app (SwiftUI)                              │
+│ Silencia.app (SwiftUI)                              │
 │  ├─ Onboarding & activation flow                    │
 │  ├─ Dashboard (protection status)                   │
 │  ├─ Custom block list management                    │
@@ -18,10 +18,10 @@
 │  └─ RangeStore (Arcep ranges + user entries)        │
 │           │ App Group (shared container)            │
 │           ▼                                         │
-│ SilencioBlocker.appex (Call Directory Extension)    │
+│ SilenciaBlocker.appex (Call Directory Extension)    │
 │  └─ Streams blocking entries to CallKit             │
 │                                                     │
-│ [v1.x] SilencioSMS.appex (Message Filter Extension) │
+│ [v1.x] SilenciaSMS.appex (Message Filter Extension) │
 └─────────────────────────────────────────────────────┘
         │ (read-only, no personal data)
         ▼
@@ -124,7 +124,7 @@ for range in ranges.sorted(by: { $0.base < $1.base }) {
 ### 3.1 Modules
 
 ```
-Silencio/
+Silencia/
 ├─ App/                    // entry, DI, routing
 ├─ Features/
 │  ├─ Onboarding/          // promise → explainer → activation → success
@@ -137,7 +137,7 @@ Silencio/
 │  ├─ ExtensionBridge/     // CXCallDirectoryManager status + reload orchestration
 │  ├─ Purchases/           // StoreKit 2 wrapper, entitlement cache
 │  └─ DesignSystem/        // colors, type, components
-└─ SilencioBlocker/        // the extension target
+└─ SilenciaBlocker/        // the extension target
 ```
 
 ### 3.2 Activation flow (F2) — engineering details
@@ -160,7 +160,7 @@ Silencio/
 
 ### 3.5 Paywall & StoreKit 2
 
-- One product: `silencio.lifetime` (non-consumable).
+- One product: `silencia.lifetime` (non-consumable).
 - `Transaction.currentEntitlements` on launch → cache in App Group.
 - Restore purchases button (App Review requirement).
 - Price displayed via StoreKit views to get locale/VAT right.
@@ -215,7 +215,7 @@ Solo developer, part-time (~10–15 h/week assumed). Sequenced for de-risking: t
 
 ## 7. Open questions
 
-1. **Name availability:** reserve "Silencio" in App Store Connect immediately; INPI/EUIPO search before spending on brand assets. Fallbacks: Raccroche, Tranquille.
+1. **Name availability:** reserve "Silencia" in App Store Connect immediately; INPI/EUIPO search before spending on brand assets. Fallbacks: Raccroche, Tranquille.
 2. **Price test:** 9,99 € vs 12,99 € lifetime — consider launching at 6,99 € promo and raising; lifetime pricing is hard to lower later without angering early buyers (it isn't — raising is the safe direction).
 3. **Progress reporting** during first load: ship indeterminate, measure complaints, add App Group progress file only if needed.
 4. **iOS 26 CallKit changes:** verify at Xcode beta time whether Call Directory APIs or Settings paths changed; the activation screenshots must match the current iOS Settings layout at launch.
