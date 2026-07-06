@@ -34,11 +34,10 @@ struct ActivationView: View {
 
                 Spacer()
 
-                if model.isReloading {
-                    loadingIndicator
-                } else {
-                    waitingIndicator
-                }
+                // This screen's only job is to wait for the toggle. The moment the
+                // extension is enabled we advance to Success, which owns the paged
+                // load's progress UI — so there's no "loading numbers" state here.
+                waitingIndicator
 
                 Button {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -71,18 +70,6 @@ struct ActivationView: View {
         .padding(.bottom, 14)
     }
 
-    private var loadingIndicator: some View {
-        HStack(spacing: 10) {
-            ProgressView()
-                .tint(Brand.brick)
-            Text("Chargement des \(FrenchFormat.count(model.activePlan.totalEntries)) de numéros…")
-                .font(.system(size: 14))
-                .foregroundStyle(Brand.inkMuted)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.bottom, 14)
-    }
-
     private var bottomLinks: some View {
         HStack {
             Button("Plus tard", action: onLater)
@@ -105,21 +92,26 @@ struct ActivationView: View {
     /// disappear). On detection: start the paged load, then the success state.
     private func pollForActivation() async {
         while !Task.isCancelled {
+            // A paged load already in flight means iOS enabled the extension and
+            // `syncExtension` is underway (e.g. `start()` detected an already-enabled
+            // extension before this screen appeared). We're past activation — advance
+            // regardless of what a transiently-flapping status query reports.
+            if model.isReloading {
+                onActivated()
+                return
+            }
+
+            await model.refreshExtensionStatus()
+
             #if targetEnvironment(simulator)
-                // simulateActivation() may have set the status directly.
-                if model.extensionStatus.isEnabled {
-                    onActivated()
-                    return
-                }
-                await model.refreshExtensionStatus()
+                // The simulator can't report real status; drop `.unavailable` so we
+                // keep waiting for the dev shortcut (simulateActivation) instead of
+                // spinning on a failing query.
                 if case .unavailable = model.extensionStatus {
-                    // The simulator can't report real status; keep waiting for the
-                    // dev shortcut instead of spinning on a failing query.
                     model.clearUnavailableStatus()
                 }
-            #else
-                await model.refreshExtensionStatus()
             #endif
+
             if model.extensionStatus.isEnabled {
                 // Kick the paged load off without blocking the success moment: the
                 // unstructured task survives this screen's dismissal, holds a
