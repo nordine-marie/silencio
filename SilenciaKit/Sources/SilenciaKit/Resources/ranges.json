@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "updated": "2026-07-01",
+  "ranges": [
+    { "prefix": "33162", "label": "01 62" },
+    { "prefix": "33163", "label": "01 63" },
+    { "prefix": "33270", "label": "02 70" },
+    { "prefix": "33271", "label": "02 71" },
+    { "prefix": "33377", "label": "03 77" },
+    { "prefix": "33378", "label": "03 78" },
+    { "prefix": "33424", "label": "04 24" },
+    { "prefix": "33425", "label": "04 25" },
+    { "prefix": "33568", "label": "05 68" },
+    { "prefix": "33569", "label": "05 69" },
+    { "prefix": "33948", "label": "09 48" },
+    { "prefix": "33949", "label": "09 49" }
+  ]
+}
