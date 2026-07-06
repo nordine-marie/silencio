@@ -16,9 +16,12 @@ struct ActivationView: View {
             Brand.cream.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
-                Text("Dernière étape")
-                    .font(.brandScreenTitle)
-                    .foregroundStyle(Brand.ink)
+                HStack(spacing: 10) {
+                    BrandMark(height: 26, color: Brand.brick)
+                    Text("Dernière étape")
+                        .font(.brandScreenTitle)
+                        .foregroundStyle(Brand.ink)
+                }
 
                 Text(
                     "Votre iPhone demande d'activer Silencia une seule fois dans les Réglages. "

@@ -97,9 +97,12 @@ struct DashboardView: View {
 
     private var header: some View {
         HStack {
-            Text("Silencia")
-                .font(.brandHeader)
-                .foregroundStyle(Brand.ink)
+            HStack(spacing: 9) {
+                BrandMark(height: 24, color: Brand.brick)
+                Text("Silencia")
+                    .font(.brandHeader)
+                    .foregroundStyle(Brand.ink)
+            }
             Spacer()
             Button {
                 showSettings = true
@@ -118,11 +121,7 @@ struct DashboardView: View {
 
     private var activeHero: some View {
         VStack(spacing: 16) {
-            Image(systemName: "checkmark.shield")
-                .font(.system(size: 44, weight: .medium))
-                .foregroundStyle(Brand.cream)
-                .frame(width: 86, height: 86)
-                .background(Brand.cream.opacity(0.16), in: RoundedRectangle(cornerRadius: 26))
+            BrandStatusIcon(state: .active)
             Text("Protection active")
                 .font(.brandTitle)
                 .foregroundStyle(Brand.cream)
@@ -141,11 +140,7 @@ struct DashboardView: View {
 
     private var pausedHero: some View {
         VStack(spacing: 16) {
-            Image(systemName: "xmark.shield")
-                .font(.system(size: 42, weight: .medium))
-                .foregroundStyle(Brand.cream)
-                .frame(width: 86, height: 86)
-                .background(Brand.amber, in: RoundedRectangle(cornerRadius: 26))
+            BrandStatusIcon(state: .paused)
             Text("Protection en pause")
                 .font(.system(size: 24, weight: .heavy))
                 .foregroundStyle(Brand.ink)
@@ -267,8 +262,64 @@ struct DashboardView: View {
     }
 }
 
+/// The brand monogram as the hero's status anchor: the app-icon "S" on a tinted
+/// tile, with a corner badge that carries the *state* — a checkmark once protected,
+/// a pause glyph when the user turned it off in iOS Settings. During activation the
+/// mark stands alone (`.activating`); the badge appears only once there's a state to
+/// announce. Using the monogram (not a generic SF shield) ties the home screen back
+/// to the icon the user tapped, while the badge keeps the three states distinct.
+private struct BrandStatusIcon: View {
+    enum State { case activating, active, paused }
+    let state: State
+
+    /// The tile behind the monogram.
+    private var tile: Color {
+        switch state {
+        case .activating, .active: Brand.cream.opacity(0.16)
+        case .paused: Brand.amber
+        }
+    }
+
+    /// The hero surface behind the tile — the badge rings itself in it so it reads
+    /// as a cut-out sitting on the card, not a floating dot.
+    private var surface: Color {
+        switch state {
+        case .activating, .active: Brand.brick
+        case .paused: Brand.amberBg
+        }
+    }
+
+    var body: some View {
+        BrandMark(height: 44, color: Brand.cream)
+            .frame(width: 86, height: 86)
+            .background(tile, in: RoundedRectangle(cornerRadius: 26))
+            .overlay(alignment: .bottomTrailing) { badge }
+    }
+
+    @ViewBuilder private var badge: some View {
+        switch state {
+        case .activating:
+            EmptyView()
+        case .active:
+            badgeCircle(glyph: "checkmark", tint: Brand.brick)
+        case .paused:
+            badgeCircle(glyph: "pause.fill", tint: Brand.amber)
+        }
+    }
+
+    private func badgeCircle(glyph: String, tint: Color) -> some View {
+        Image(systemName: glyph)
+            .font(.system(size: 14, weight: .heavy))
+            .foregroundStyle(tint)
+            .frame(width: 30, height: 30)
+            .background(Brand.cream, in: Circle())
+            .overlay(Circle().strokeBorder(surface, lineWidth: 3))
+            .offset(x: 7, y: 7)
+    }
+}
+
 /// The activation-in-progress hero: same brick surface as the active state
-/// (protection is arriving, not paused), a shield without its checkmark yet, and
+/// (protection is arriving, not paused), the brand mark without its badge yet, and
 /// the brick-course progress bar — one brick per Arcep range.
 ///
 /// The loader's real cursor advances in ~1.8M-entry jumps (one per reload round),
@@ -309,11 +360,7 @@ private struct LoadingHero: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "shield")
-                .font(.system(size: 44, weight: .medium))
-                .foregroundStyle(Brand.cream)
-                .frame(width: 86, height: 86)
-                .background(Brand.cream.opacity(0.16), in: RoundedRectangle(cornerRadius: 26))
+            BrandStatusIcon(state: .activating)
             Text("Activation en cours")
                 .font(.brandTitle)
                 .foregroundStyle(Brand.cream)

@@ -70,6 +70,26 @@ extension Font {
 
 // MARK: - Components
 
+/// The Silencia monogram — the app-icon glyph (the hexagonal "S") as a tintable
+/// mark. Backed by the `LogoMark` template asset, so `foregroundStyle` colors it.
+/// Sized by height; the glyph keeps its own aspect. This is the app icon made
+/// portable: use it wherever the brand should be present (headers, footers,
+/// onboarding, the dashboard hero) so every surface ties back to the home-screen
+/// icon the user tapped.
+struct BrandMark: View {
+    var height: CGFloat
+    var color: Color = Brand.brick
+
+    var body: some View {
+        Image("LogoMark")
+            .resizable()
+            .scaledToFit()
+            .frame(height: height)
+            .foregroundStyle(color)
+            .accessibilityHidden(true)
+    }
+}
+
 /// Primary action button: 60 pt tall, radius 18, bold 18 pt label.
 struct PrimaryButtonStyle: ButtonStyle {
     var background: Color = Brand.brick
