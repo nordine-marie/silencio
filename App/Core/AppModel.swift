@@ -103,6 +103,12 @@ final class AppModel: ObservableObject {
     /// Startup: check the extension status and resume any unfinished paged load.
     /// Called from the root view's `.task`.
     func start() async {
+        // Persist the config *before* the extension can run so it streams exactly
+        // the app's plan. Without this the extension falls back to its own bundled
+        // source, and if that ever diverges from the app's the fingerprints won't
+        // match — the completion check never passes and the load re-drives forever
+        // (reload loop after full load). See `persistConfig`.
+        persistConfig()
         await refreshExtensionStatus()
         if extensionStatus.isEnabled {
             await syncExtension()
@@ -150,8 +156,13 @@ final class AppModel: ObservableObject {
         persistAndReload()
     }
 
-    /// Writes the config the extension reads, then drives the paged reload.
-    private func persistAndReload() {
+    /// Writes the config the extension reads. Called eagerly at startup and after
+    /// every mutation so the app and the extension always agree on *which* plan the
+    /// paged-load cursor refers to: the extension streams `SharedConfig.load()`,
+    /// and the app's completion check compares fingerprints against `activePlan`.
+    /// If the two ever built different plans the check would never pass and the
+    /// load would re-drive forever — the "reload loop after full load" this guards.
+    private func persistConfig() {
         do {
             try config.save()
         } catch {
@@ -159,6 +170,11 @@ final class AppModel: ObservableObject {
             // the extension falls back to the bundled full range set.
             NSLog("[Silencia] config save failed: \(error.localizedDescription)")
         }
+    }
+
+    /// Writes the config the extension reads, then drives the paged reload.
+    private func persistAndReload() {
+        persistConfig()
         Task { await syncExtension() }
     }
 
@@ -197,7 +213,8 @@ final class AppModel: ObservableObject {
             let plan = activePlan
             if let state = LoaderState.load(),
                state.planFingerprint == plan.fingerprint,
-               state.isComplete {
+               state.isComplete
+            {
                 loadProgress = .complete
                 return
             }
@@ -246,12 +263,13 @@ final class AppModel: ObservableObject {
 
     private func beginBackgroundAssertion() {
         endBackgroundAssertion()
-        backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "silencia.sync") { [weak self] in
-            // Expiration is delivered on the main thread.
-            MainActor.assumeIsolated {
-                self?.endBackgroundAssertion()
+        backgroundTaskID = UIApplication.shared
+            .beginBackgroundTask(withName: "silencia.sync") { [weak self] in
+                // Expiration is delivered on the main thread.
+                MainActor.assumeIsolated {
+                    self?.endBackgroundAssertion()
+                }
             }
-        }
     }
 
     private func endBackgroundAssertion() {

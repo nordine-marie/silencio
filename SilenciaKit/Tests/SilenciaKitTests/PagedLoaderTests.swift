@@ -76,6 +76,51 @@ final class PagedLoaderTests: XCTestCase {
         )
     }
 
+    // MARK: App ↔ extension plan agreement (the completion gate's hidden dependency)
+
+    func testBundledPlanSourcesAgreeOnFingerprint() {
+        // The app builds its plan from `RangeData.loadBundled()`; the extension's
+        // no-config fallback must build an *identical* plan. If `ranges.json` and
+        // the hardcoded `bundledDefault` ever drift, their fingerprints diverge,
+        // the app's completion check (`state.planFingerprint == plan.fingerprint`)
+        // never passes, and a fully-loaded plan re-drives forever. This test fails
+        // the moment the two sources fall out of lockstep.
+        let fromJSON = BlockingPlan(arcepRanges: RangeData.loadBundled().ranges)
+        let fromHardcoded = BlockingPlan(arcepRanges: RangeData.bundledDefault.ranges)
+        XCTAssertEqual(fromJSON.fingerprint, fromHardcoded.fingerprint)
+        XCTAssertEqual(fromJSON.totalEntries, fromHardcoded.totalEntries)
+    }
+
+    func testExtensionCompletedCursorReadsCompleteInApp() {
+        // End-to-end of the completion gate: the extension finishes a full load and
+        // saves a cursor stamped with *its* plan fingerprint; the app then re-checks
+        // that cursor against *its own* plan. Same source ⇒ same fingerprint ⇒ the
+        // reload loop stops. Mirrors `AppModel.syncExtension`'s completion branch and
+        // `PagedLoader`'s row 5.
+        let extensionPlan = BlockingPlan(arcepRanges: RangeData.loadBundled().ranges)
+        let savedByExtension = LoaderState(
+            planFingerprint: extensionPlan.fingerprint,
+            entriesLoaded: extensionPlan.totalEntries,
+            totalEntries: extensionPlan.totalEntries
+        )
+
+        let appPlan = BlockingPlan(arcepRanges: RangeData.loadBundled().ranges)
+        XCTAssertEqual(
+            savedByExtension.planFingerprint,
+            appPlan.fingerprint,
+            "the app must recognise the extension's completed cursor"
+        )
+        XCTAssertTrue(savedByExtension.isComplete)
+        XCTAssertEqual(
+            PagedLoader.nextAction(
+                isIncremental: true, state: savedByExtension,
+                planFingerprint: appPlan.fingerprint, totalEntries: appPlan.totalEntries
+            ),
+            .alreadyComplete,
+            "a re-triggered reload of an already-complete plan must add nothing"
+        )
+    }
+
     // MARK: Page extraction (§2.5)
 
     func testPagesConcatenateToTheFullStream() {

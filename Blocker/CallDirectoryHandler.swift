@@ -34,6 +34,15 @@ final class CallDirectoryHandler: CXCallDirectoryProvider {
             totalEntries: plan.totalEntries
         )
 
+        // Diagnostic: a load that never "sticks" (reload loop after full load) shows
+        // up here as either repeated `emitFirstPage` (iOS keeps handing us
+        // non-incremental contexts, so the cursor never advances past page 1) or a
+        // `fingerprint` that disagrees with the app's. Cheap to log, decisive to read.
+        NSLog(
+            "[SilenciaBlocker] beginRequest isIncremental=\(context.isIncremental) "
+                + "action=\(action) fingerprint=\(plan.fingerprint) total=\(plan.totalEntries)"
+        )
+
         let start: Int64
         switch action {
         case .emitFirstPage:
@@ -91,13 +100,16 @@ final class CallDirectoryHandler: CXCallDirectoryProvider {
     }
 
     /// Builds the plan the extension should apply. Reads active ranges + user runs
-    /// from the App Group when available (see `SharedConfig`), else falls back to
-    /// the full bundled Arcep set.
+    /// from the App Group when available (see `SharedConfig`) — the app persists it
+    /// before any reload, so this is the normal path and it matches the app's plan
+    /// exactly. The fallback uses `RangeData.loadBundled()` (the *same* source the
+    /// app builds its plan from), not the hardcoded `bundledDefault`, so even if the
+    /// config is momentarily absent the two never disagree on the plan fingerprint.
     private func activePlan() -> BlockingPlan {
         if let config = SharedConfig.load() {
             return config.plan()
         }
-        return BlockingPlan(arcepRanges: RangeData.bundledDefault.ranges)
+        return BlockingPlan(arcepRanges: RangeData.loadBundled().ranges)
     }
 }
 
