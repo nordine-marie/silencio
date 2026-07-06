@@ -1,0 +1,26 @@
+#:schema https://conductor.build/schemas/settings.repo.schema.json
+
+# Shared Conductor configuration for Silencia — an iOS app (Swift 6 / SwiftUI).
+# The .xcodeproj is a gitignored build artifact regenerated from project.yml,
+# so each new workspace must (re)generate it before it can build or run.
+# All commands are thin wrappers over the repo's existing scripts/ harness.
+
+[scripts]
+# One-time workspace setup. bootstrap.sh is idempotent: it ensures the Homebrew
+# harness tools (xcodegen, xcbeautify, swiftlint, swiftformat) are installed,
+# then generates Silencia.xcodeproj from project.yml. Safe to re-run.
+setup = "scripts/bootstrap.sh"
+
+# Run button: boot the simulator, build, install, launch, and screenshot the app
+# (scripts/run.sh). This is an iOS Simulator app with no web server or
+# configurable port, so CONDUCTOR_PORT does not apply here.
+run = "scripts/run.sh"
+
+# Archive cleanup: remove this app from the booted simulator. Best-effort and
+# guarded so archiving never fails when no simulator is booted.
+archive = "xcrun simctl uninstall booted com.silencia.app || true"
+
+# run.sh drives a single shared simulator (default "iPhone 17") and installs a
+# fixed bundle id (com.silencia.app), so only one workspace can run the app at a
+# time — concurrent runs would fight over the same simulator and install.
+run_mode = "nonconcurrent"
