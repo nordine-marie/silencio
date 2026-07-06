@@ -1,6 +1,17 @@
 import Foundation
 import SilenciaKit
 import SwiftUI
+import UIKit
+
+/// Where the paged Call Directory load stands, as the UI sees it.
+enum LoadProgress: Equatable {
+    case idle
+    /// A sync loop is driving reload rounds; `loaded`/`total` come from the
+    /// extension's persisted cursor — real, determinate progress.
+    case loading(loaded: Int64, total: Int64)
+    case complete
+    case failed(String)
+}
 
 /// The app's single source of truth. Owns the shared config (ranges, user
 /// entries), persists it to the App Group, and orchestrates extension reloads.
@@ -14,9 +25,15 @@ import SwiftUI
 final class AppModel: ObservableObject {
     @Published private(set) var userEntries: [BlockEntry]
     @Published private(set) var extensionStatus: ExtensionStatus = .unknown
-    @Published private(set) var isReloading = false
+    @Published private(set) var loadProgress: LoadProgress = .idle
     @Published var onboardingComplete: Bool {
         didSet { UserDefaults.standard.set(onboardingComplete, forKey: Self.onboardingKey) }
+    }
+
+    /// Kept for the views that only need "is a load in flight".
+    var isReloading: Bool {
+        if case .loading = loadProgress { return true }
+        return false
     }
 
     let rangeData: RangeData
@@ -55,6 +72,10 @@ final class AppModel: ObservableObject {
                 debugStatusOverride = .enabled
             case .paused:
                 debugStatusOverride = .disabled
+            case .loading:
+                // Mid-load snapshot: 7.58M / 12M → 7 full bricks + a partial 8th.
+                debugStatusOverride = .enabled
+                loadProgress = .loading(loaded: 7_580_000, total: 12_000_000)
             case .blocklist:
                 debugStatusOverride = .enabled
                 // Transient demo entries (design screen 07) — not persisted.
@@ -79,9 +100,22 @@ final class AppModel: ObservableObject {
 
     // MARK: Lifecycle
 
-    /// Startup: check the extension status. Called from the root view's `.task`.
+    /// Startup: check the extension status and resume any unfinished paged load.
+    /// Called from the root view's `.task`.
     func start() async {
         await refreshExtensionStatus()
+        if extensionStatus.isEnabled {
+            await syncExtension()
+        }
+    }
+
+    /// Foreground hook (`scenePhase == .active`): re-check status and resume an
+    /// unfinished load — this is what makes an interrupted first load self-healing.
+    func onForeground() async {
+        await refreshExtensionStatus()
+        if extensionStatus.isEnabled {
+            await syncExtension()
+        }
     }
 
     func refreshExtensionStatus() async {
@@ -116,7 +150,7 @@ final class AppModel: ObservableObject {
         persistAndReload()
     }
 
-    /// Writes the config the extension reads, then asks iOS to re-run it.
+    /// Writes the config the extension reads, then drives the paged reload.
     private func persistAndReload() {
         do {
             try config.save()
@@ -125,19 +159,105 @@ final class AppModel: ObservableObject {
             // the extension falls back to the bundled full range set.
             NSLog("[Silencia] config save failed: \(error.localizedDescription)")
         }
-        Task { await reloadExtension() }
+        Task { await syncExtension() }
     }
 
-    /// Triggers an extension reload with the staged progress UI (§3.2: the
-    /// extension can't report progress; the app shows an indeterminate state).
-    func reloadExtension() async {
-        guard !isReloading else { return }
-        isReloading = true
-        defer { isReloading = false }
-        if let errorMessage = await bridge.reload() {
-            NSLog("[Silencia] extension reload failed: \(errorMessage)")
+    /// True when the enabled extension hasn't fully loaded the current plan —
+    /// drives background-task scheduling and foreground resume.
+    var needsSync: Bool {
+        guard let state = LoaderState.load() else { return true }
+        return state.planFingerprint != activePlan.fingerprint || !state.isComplete
+    }
+
+    /// Drives reload rounds until the extension's persisted cursor says the current
+    /// plan is fully loaded (paged-loading-plan.md §2.7). Each round the extension
+    /// emits one ≤1.8M page; CallKit caps requests at 2M entries, so this loop *is*
+    /// how the 12M set gets in. Holds a background-task assertion so leaving the
+    /// app doesn't stall the load; if iOS still suspends us, the persisted cursor
+    /// lets any later trigger (foreground, BGProcessingTask) resume seamlessly.
+    func syncExtension() async {
+        #if DEBUG
+            // Screen-harness runs stage loadProgress themselves; a real sync loop
+            // would overwrite the staged state (and fail on the simulator anyway).
+            if debugStatusOverride != nil { return }
+        #endif
+        guard extensionStatus.isEnabled, !isSyncing else { return }
+        isSyncing = true
+        beginBackgroundAssertion()
+        defer {
+            endBackgroundAssertion()
+            isSyncing = false
         }
-        await refreshExtensionStatus()
+
+        var invalidatedOnce = false
+        var rounds = 0
+        while !Task.isCancelled {
+            // Recomputed every round: a mutation mid-loop simply retargets the loop
+            // (the extension restarts via the fingerprint mismatch, decision row 3).
+            let plan = activePlan
+            if let state = LoaderState.load(),
+               state.planFingerprint == plan.fingerprint,
+               state.isComplete {
+                loadProgress = .complete
+                return
+            }
+
+            // +3: one spare for an invalidation retry, two for a mid-loop restart.
+            let bound = PagedLoader.pageCount(totalEntries: plan.totalEntries) + 3
+            guard rounds < bound else {
+                loadProgress = .failed("Le chargement n'a pas abouti.")
+                return
+            }
+
+            loadProgress = .loading(
+                loaded: LoaderState.load()?.entriesLoaded ?? 0,
+                total: plan.totalEntries
+            )
+
+            if let errorMessage = await bridge.reload() {
+                NSLog("[Silencia] reload round failed: \(errorMessage)")
+                guard !invalidatedOnce else {
+                    loadProgress = .failed(errorMessage)
+                    return
+                }
+                // One recovery attempt: drop the cursor, rebuild from scratch.
+                invalidatedOnce = true
+                LoaderState.invalidate()
+            }
+            rounds += 1
+        }
+        // Cancelled (background time expired): the cursor is persisted; the next
+        // trigger resumes exactly where this loop stopped.
+    }
+
+    /// Recovery hatch (dashboard « Réessayer », Settings maintenance): drop the
+    /// cursor and rebuild the whole store deterministically.
+    func retrySync() async {
+        LoaderState.invalidate()
+        loadProgress = .idle
+        await syncExtension()
+    }
+
+    private var isSyncing = false
+
+    // MARK: Background-task assertion (keeps a load alive when the app is left)
+
+    private var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
+
+    private func beginBackgroundAssertion() {
+        endBackgroundAssertion()
+        backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "silencia.sync") { [weak self] in
+            // Expiration is delivered on the main thread.
+            MainActor.assumeIsolated {
+                self?.endBackgroundAssertion()
+            }
+        }
+    }
+
+    private func endBackgroundAssertion() {
+        guard backgroundTaskID != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(backgroundTaskID)
+        backgroundTaskID = .invalid
     }
 
     #if targetEnvironment(simulator)

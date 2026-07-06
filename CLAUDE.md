@@ -3,10 +3,12 @@
 Silencia is an **iOS** app (Swift 6 / SwiftUI, iOS 16+) that blocks French telemarketing
 calls. In France, cold-callers must legally use known Arcep number ranges, so blocking is
 **deterministic**, not heuristic. The core is a **CallKit Call Directory extension** that
-streams ~12,000,000 blocked numbers to the system.
+streams ~12,000,000 blocked numbers to the system — in **paged reload rounds of ≤1.8M**,
+because CallKit hard-caps each `beginRequest` at 2,000,000 entries (see
+`docs/paged-loading-plan.md`; the cap only surfaces on a physical device, never the simulator).
 
-Product context lives in `docs/` (`product-spec.md`, `implementation-plan.md`, `design/`).
-Read those before designing features.
+Product context lives in `docs/` (`product-spec.md`, `implementation-plan.md`,
+`paged-loading-plan.md`, `design/`). Read those before designing features.
 
 ## The one thing to understand about testing this app
 
@@ -57,8 +59,8 @@ Set a different simulator with `SIM_NAME="iPhone 17 Pro" scripts/run.sh`.
 **Screenshotting individual screens:** the simulator has no tap tooling, so Debug
 builds accept a launch argument to open any screen directly:
 `xcrun simctl launch booted com.silencia.app --screen=<name>` with
-`promise | how | activation | success | dashboard | paused | blocklist | settings`
-(see `App/Core/DebugScreens.swift`; `paused`/`blocklist` also seed demo state).
+`promise | how | activation | success | dashboard | paused | loading | blocklist | settings`
+(see `App/Core/DebugScreens.swift`; `paused`/`loading`/`blocklist` also seed demo state).
 
 ## Rules of the road
 
@@ -71,6 +73,10 @@ builds accept a launch argument to open any screen directly:
   (O(1) memory) and drains an `autoreleasepool` each chunk — the ~6 MB budget is a hard
   constraint (see `implementation-plan.md` §2.3). Preserve the strictly-ascending invariant;
   CallKit rejects out-of-order or duplicate entries. `BlockingPlanTests` guards this.
+- **Never emit more than 2,000,000 entries in one `beginRequest`.** CallKit rejects the whole
+  request (Code=5) — the store stays empty and the Settings toggle bounces back. Loading is
+  paged (`docs/paged-loading-plan.md`): the app drives reload rounds, the extension emits one
+  ≤1.8M page per round from a cursor persisted in the App Group.
 - **Simulator can't test real blocking.** Device/TestFlight is required for the call-blocking
   matrix in `implementation-plan.md` §2.5. Don't claim blocking "works" from a simulator run.
 - **Privacy covenant:** no third-party SDKs, no analytics, no network with personal data.
