@@ -38,7 +38,7 @@ struct SuccessView: View {
 
                     Text(
                         "Vous n'entendrez plus jamais un démarcheur. "
-                            + "Vous pouvez oublier Silencia — il veille."
+                            + "Vous pouvez oublier Silencia. Il veille pour vous."
                     )
                     .font(.system(size: 18))
                     .lineSpacing(4)

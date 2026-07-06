@@ -21,8 +21,8 @@ struct ActivationView: View {
                     .foregroundStyle(Brand.ink)
 
                 Text(
-                    "iOS demande d'activer Silencia une seule fois dans les Réglages. "
-                        + "Suivez les 5 étapes — on détecte automatiquement quand c'est fait."
+                    "Votre iPhone demande d'activer Silencia une seule fois dans les Réglages. "
+                        + "Suivez les 5 étapes ci-dessous. On vous prévient dès que c'est bon."
                 )
                 .font(.brandRow)
                 .lineSpacing(3)
