@@ -20,6 +20,17 @@ struct BlockListView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     header
 
+                    Text(
+                        "Le démarchage est déjà bloqué automatiquement.\n"
+                            + "Ajoutez ici seulement les numéros gênants restants."
+                    )
+                    .font(.system(size: 13.5))
+                    .lineSpacing(3)
+                    .foregroundStyle(Brand.inkFaint)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .padding(.bottom, 18)
+
                     inputField
 
                     if let feedback {
@@ -40,18 +51,6 @@ struct BlockListView: View {
 
                         entriesCard
                     }
-
-                    Spacer(minLength: 40)
-
-                    Text(
-                        "Le démarchage est déjà bloqué automatiquement.\n"
-                            + "Ajoutez ici seulement les numéros gênants restants."
-                    )
-                    .font(.system(size: 13.5))
-                    .lineSpacing(3)
-                    .foregroundStyle(Brand.inkFaint)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
                 }
                 .padding(.horizontal, 22)
                 .padding(.bottom, 30)
